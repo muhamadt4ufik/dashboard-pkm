@@ -141,20 +141,25 @@ section { padding:80px 5%; }
 .accordion-item.active .accordion-content { max-height:500px; padding:0 25px 25px; }
 .accordion-content p { color:#475569; line-height:1.7; }
 
-/* GALLERY */
-.gallery-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; max-width:1200px; margin:0 auto; }
-.gallery-item {
-  position:relative; border-radius:20px; overflow:hidden; aspect-ratio:1/1;
-  cursor:pointer; box-shadow:0 10px 30px rgba(0,0,0,0.1);
+/* QR CODE GALLERY */
+.qr-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:30px; max-width:1200px; margin:0 auto; }
+.qr-item {
+  background:#fff; border-radius:20px; padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08); text-align:center;
+  transition:all .4s; border:2px solid rgba(99,102,241,0.1);
 }
-.gallery-item img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
-.gallery-item:hover img { transform:scale(1.1); }
-.gallery-overlay {
-  position:absolute; inset:0; background:linear-gradient(to top,rgba(99,102,241,0.9),transparent);
-  display:flex; align-items:flex-end; padding:20px; color:#fff; opacity:0; transition:opacity .3s;
+.qr-item:hover { transform:translateY(-10px); box-shadow:0 20px 50px rgba(99,102,241,0.2); border-color:var(--primary); }
+.qr-placeholder {
+  width:100%; aspect-ratio:1/1; background:#f1f5f9; border-radius:15px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  margin-bottom:20px; border:3px dashed var(--primary); position:relative; overflow:hidden;
 }
-.gallery-item:hover .gallery-overlay { opacity:1; }
-.gallery-overlay h4 { font-size:1.1rem; }
+.qr-placeholder img { width:85%; height:85%; object-fit:contain; }
+.qr-placeholder .placeholder-text {
+  color:#94a3b8; font-size:.9rem; text-align:center; padding:20px;
+}
+.qr-item h4 { font-size:1.1rem; color:var(--dark); margin-bottom:10px; }
+.qr-item p { color:#64748b; font-size:.9rem; line-height:1.6; }
 
 /* FORMS */
 .form-container { max-width:700px; margin:0 auto; background:#fff; padding:40px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.08); }
@@ -294,32 +299,19 @@ footer {
   <div class="about-grid">
     <div class="about-img fade-in">
       <h3><i class="fas fa-bullseye"></i> Visi & Misi</h3>
-      <p><strong>Visi:</strong> Menjadi jembatan antara dunia akademis dan kebutuhan masyarakat, khususnya di Kecamatan Tambun Selatan, melalui program-program pengabdian yang inovatif, aplikatif, dan berkelanjutan. dan berkelanjutan.</p>
+      <p><strong>Visi:</strong> Menjadi jembatan antara dunia akademis dan kebutuhan masyarakat, khususnya di Kecamatan Tambun Selatan, melalui program-program pengabdian yang inovatif, aplikatif, dan berkelanjutan.</p>
       <br>
-      <p><strong>Misi:</strong> Mengaplikasikan Ilmu: Menerapkan pengetahuan dan teori manajemen yang kami peroleh di bangku kuliah untuk membantu memecahkan permasalahan nyata yang dihadapi masyarakat .
-
-
-
-Memberdayakan Masyarakat: Merancang dan melaksanakan kegiatan yang bertujuan untuk meningkatkan kapasitas dan kesejahteraan masyarakat, seperti pelatihan keterampilan dan pengembangan usaha .
-
-
-
-Menjalin Kolaborasi: Membangun kemitraan yang sinergis dengan berbagai pihak di Kecamatan Tambun Selatan, termasuk pemerintah kecamatan, pelaku UMKM, dan tokoh masyarakat.
-
-
-
-Menginspirasi: Melalui blog ini, kami berharap dapat berbagi pengalaman dan menginspirasi mahasiswa lain untuk turut aktif dalam kegiatan pengabdian masyarakat..</p>
+      <p><strong>Misi:</strong></p>
+      <p>• Mengaplikasikan Ilmu: Menerapkan pengetahuan dan teori manajemen yang kami peroleh di bangku kuliah untuk membantu memecahkan permasalahan nyata yang dihadapi masyarakat.</p>
+      <p>• Memberdayakan Masyarakat: Merancang dan melaksanakan kegiatan yang bertujuan untuk meningkatkan kapasitas dan kesejahteraan masyarakat, seperti pelatihan keterampilan dan pengembangan usaha.</p>
+      <p>• Menjalin Kolaborasi: Membangun kemitraan yang sinergis dengan berbagai pihak di Kecamatan Tambun Selatan, termasuk pemerintah kecamatan, pelaku UMKM, dan tokoh masyarakat.</p>
+      <p>• Menginspirasi: Melalui blog ini, kami berharap dapat berbagi pengalaman dan menginspirasi mahasiswa lain untuk turut aktif dalam kegiatan pengabdian masyarakat.</p>
     </div>
     <div class="about-text fade-in">
       <h3>Siapa Kami?</h3>
-      <p>Selamat datang di blog resmi kami, sebuah ruang digital yang kami dedikasikan untuk mendokumentasikan perjalanan dan dedikasi kami dalam melaksanakan Pengabdian Kepada Masyarakat (PKM).
-
-Siapa Kami?
-
-Kami adalah sekelompok mahasiswa Program Studi Magister Manajemen (S2) Universitas Pamulang. Kehadiran kami di sini bukan sekadar untuk memenuhi tuntutan akademik, melainkan sebagai wujud nyata dari komitmen kami terhadap Tri Dharma Perguruan Tinggi, khususnya dalam pilar pengabdian kepada masyarakat .
-
-
-Kecamatan Tambun Selatan, Kabupaten Bekasi</p>
+      <p>Selamat datang di blog resmi kami, sebuah ruang digital yang kami dedikasikan untuk mendokumentasikan perjalanan dan dedikasi kami dalam melaksanakan Pengabdian Kepada Masyarakat (PKM).</p>
+      <p>Kami adalah sekelompok mahasiswa Program Studi Magister Manajemen (S2) Universitas Pamulang. Kehadiran kami di sini bukan sekadar untuk memenuhi tuntutan akademik, melainkan sebagai wujud nyata dari komitmen kami terhadap Tri Dharma Perguruan Tinggi, khususnya dalam pilar pengabdian kepada masyarakat.</p>
+      <p><strong>Kecamatan Tambun Selatan, Kabupaten Bekasi</strong></p>
       <p>Program PKM kami dirancang untuk menjawab tantangan sosial melalui pendekatan partisipatif, kolaboratif, dan berkelanjutan.</p>
       <div class="stats">
         <div class="stat-box"><h4>20+</h4><p>Peserta</p></div>
@@ -339,37 +331,33 @@ Kecamatan Tambun Selatan, Kabupaten Bekasi</p>
   </div>
   <div class="card-grid">
     <div class="card fade-in">
-      <div class="card-icon"><i class="fas fa-seedling"></i></div>
+      <div class="card-icon"><i class="fas fa-robot"></i></div>
       <h3>Materi Pelatihan</h3>
-      <p>Pelatihan pemanfaatan Artificial Intelligence secara aman dan produktif bagi 
-aparatur Kecamatan Tambun Selatan.
-.</p>
+      <p>Pelatihan pemanfaatan Artificial Intelligence secara aman dan produktif bagi aparatur Kecamatan Tambun Selatan.</p>
       <a href="#" class="card-link">Unduh Proposal <i class="fas fa-arrow-right"></i></a>
     </div>
     <div class="card fade-in">
-      <div class="card-icon"><i class="fas fa-book-reader"></i></div>
+      <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
       <h3>Demontrasi dan Praktek</h3>
-      <p>Demonstrasi dan praktik pembuatan prototipe dashboard pelayanan sederhana 
-dengan bantuan Artificial Intelligence.
-.</p>
+      <p>Demonstrasi dan praktik pembuatan prototipe dashboard pelayanan sederhana dengan bantuan Artificial Intelligence.</p>
       <a href="#" class="card-link">Unduh Proposal <i class="fas fa-arrow-right"></i></a>
     </div>
     <div class="card fade-in">
-      <div class="card-icon"><i class="fas fa-heartbeat"></i></div>
+      <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
       <h3>Evaluasi kegiatan</h3>
       <p>Menilai sejauh mana output dan dampak kegiatan telah selaras dengan visi, misi, dan indikator keberhasilan yang telah ditetapkan sejak awal.</p>
       <a href="#" class="card-link">Unduh Proposal <i class="fas fa-arrow-right"></i></a>
     </div>
     <div class="card fade-in">
-      <div class="card-icon"><i class="fas fa-leaf"></i></div>
+      <div class="card-icon"><i class="fas fa-poll"></i></div>
       <h3>Kuisioner Pelaksanaan Kegiatan</h3>
-      <p>Menilai aspek teknis pelaksanaan, mulai dari ketepatan waktu, kejelasan instruksi, kualitas platform yang digunakan, hingga performa fasilitator/pemateri di lapangan..</p>
+      <p>Menilai aspek teknis pelaksanaan, mulai dari ketepatan waktu, kejelasan instruksi, kualitas platform yang digunakan, hingga performa fasilitator/pemateri di lapangan.</p>
       <a href="#" class="card-link">Unduh Proposal <i class="fas fa-arrow-right"></i></a>
     </div>
   </div>
 </section>
 
-<!-- MATERI -->
+<!-- MATERI - UPDATED TO MATCH PROPOSAL -->
 <section id="materi">
   <div class="section-title fade-in">
     <h2>Materi PKM</h2>
@@ -379,96 +367,92 @@ dengan bantuan Artificial Intelligence.
   <div class="materi-container">
     <div class="accordion-item fade-in">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <span><i class="fas fa-laptop-code"></i> &nbsp; Modul 1: Pengantar Digital Marketing</span>
+        <span><i class="fas fa-robot"></i> &nbsp; Modul 1: Pengenalan Artificial Intelligence</span>
         <i class="fas fa-chevron-down"></i>
       </div>
       <div class="accordion-content">
-        <p>Materi ini membahas dasar-dasar digital marketing, mulai dari pengenalan platform sosial media, strategi konten, hingga teknik copywriting yang efektif untuk UMKM.</p>
+        <p>Pemahaman dasar tentang Artificial Intelligence (AI), jenis-jenis AI, dan pemanfaatannya dalam konteks pelayanan publik. Peserta akan memahami konsep machine learning, natural language processing, dan computer vision yang dapat diaplikasikan untuk meningkatkan efisiensi kerja.</p>
       </div>
     </div>
     <div class="accordion-item fade-in">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <span><i class="fas fa-chart-line"></i> &nbsp; Modul 2: Manajemen Keuangan Sederhana</span>
+        <span><i class="fas fa-shield-alt"></i> &nbsp; Modul 2: Penggunaan AI Secara Aman dan Produktif</span>
         <i class="fas fa-chevron-down"></i>
       </div>
       <div class="accordion-content">
-        <p>Panduan praktis mengelola keuangan usaha, mencatat arus kas, memisahkan keuangan pribadi dan usaha, serta perencanaan anggaran sederhana.</p>
+        <p>Panduan praktis menggunakan berbagai tools AI untuk produktivitas kerja sehari-hari. Pembahasan mencakup etika penggunaan AI, keamanan data, privasi informasi, serta best practices dalam mengimplementasikan AI untuk aparatur pemerintah kecamatan.</p>
       </div>
     </div>
     <div class="accordion-item fade-in">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <span><i class="fas fa-box-open"></i> &nbsp; Modul 3: Kemasan Produk Menarik</span>
+        <span><i class="fas fa-chart-line"></i> &nbsp; Modul 3: Pembuatan Dashboard Pelayanan dengan AI</span>
         <i class="fas fa-chevron-down"></i>
       </div>
       <div class="accordion-content">
-        <p>Teknik desain packaging yang menarik, pemilihan material ramah lingkungan, serta strategi branding untuk meningkatkan nilai jual produk.</p>
+        <p>Workshop praktis membuat prototipe dashboard pelayanan sederhana menggunakan bantuan AI. Peserta akan belajar membuat visualisasi data, analisis otomatis, dan sistem monitoring yang dapat membantu pengambilan keputusan di tingkat kecamatan.</p>
       </div>
     </div>
     <div class="accordion-item fade-in">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <span><i class="fas fa-users"></i> &nbsp; Modul 4: Kepemimpinan & Kerja Tim</span>
+        <span><i class="fas fa-tasks"></i> &nbsp; Modul 4: Implementasi AI dalam Pelayanan Publik</span>
         <i class="fas fa-chevron-down"></i>
       </div>
       <div class="accordion-content">
-        <p>Membangun jiwa kepemimpinan, komunikasi efektif, dan kolaborasi tim untuk menciptakan lingkungan kerja yang produktif dan harmonis.</p>
+        <p>Studi kasus dan praktik langsung implementasi AI untuk meningkatkan kualitas pelayanan publik di Kecamatan Tambun Selatan. Peserta akan merancang solusi AI untuk permasalahan nyata yang dihadapi dalam pelayanan masyarakat sehari-hari.</p>
       </div>
     </div>
     <div class="accordion-item fade-in">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <span><i class="fas fa-heart"></i> &nbsp; Modul 5: Kesehatan Ibu & Anak</span>
+        <span><i class="fas fa-chart-bar"></i> &nbsp; Modul 5: Evaluasi dan Monitoring Program</span>
         <i class="fas fa-chevron-down"></i>
       </div>
       <div class="accordion-content">
-        <p>Edukasi komprehensif tentang gizi seimbang, imunisasi, pencegahan stunting, dan pola asuh sehat untuk tumbuh kembang optimal anak.</p>
+        <p>Metode evaluasi dan monitoring untuk mengukur efektivitas implementasi AI dalam pelayanan publik. Peserta belajar membuat indikator kinerja, sistem pelaporan, dan strategi continuous improvement untuk program yang telah dijalankan.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- DOKUMENTASI -->
+<!-- DOKUMENTASI - QR CODES -->
 <section id="dokumentasi" style="background:#fff;">
   <div class="section-title fade-in">
     <h2>Dokumentasi Kegiatan</h2>
     <div class="line"></div>
-    <p>Momen-momen berharga dari pelaksanaan PKM</p>
+    <p>Scan QR Code untuk mengakses dokumentasi dan materi kegiatan</p>
   </div>
-  <div class="gallery-grid">
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=500" alt="Kegiatan 1">
-      <div class="gallery-overlay"><h4>Pelatihan UMKM</h4></div>
+  <div class="qr-grid">
+    <div class="qr-item fade-in">
+      <div class="qr-placeholder">
+        <img src="qr-materi.jpg" alt="QR Code Materi" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-text\'><i class=\'fas fa-qrcode\' style=\'font-size:3rem; color:#cbd5e1; margin-bottom:10px; display:block;\'></i>Scan untuk Unduh Materi</div>'">
+      </div>
+      <h4><i class="fas fa-download"></i> Unduh Materi</h4>
+      <p>Scan QR code di atas untuk mengunduh seluruh materi pelatihan PKM dalam format digital</p>
     </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500" alt="Kegiatan 2">
-      <div class="gallery-overlay"><h4>Sosialisasi Kesehatan</h4></div>
+    <div class="qr-item fade-in">
+      <div class="qr-placeholder">
+        <img src="qr-dokumen.jpg" alt="QR Code Dokumen" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-text\'><i class=\'fas fa-qrcode\' style=\'font-size:3rem; color:#cbd5e1; margin-bottom:10px; display:block;\'></i>Scan untuk Dokumen Kegiatan</div>'">
+      </div>
+      <h4><i class="fas fa-folder-open"></i> Dokumen Kegiatan</h4>
+      <p>Scan QR code di atas untuk mengakses dokumentasi lengkap kegiatan PKM termasuk proposal, laporan, dan surat menyurat</p>
     </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500" alt="Kegiatan 3">
-      <div class="gallery-overlay"><h4>Workshop Digital</h4></div>
+    <div class="qr-item fade-in">
+      <div class="qr-placeholder">
+        <img src="qr-sertifikat.jpg" alt="QR Code Sertifikat" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-text\'><i class=\'fas fa-qrcode\' style=\'font-size:3rem; color:#cbd5e1; margin-bottom:10px; display:block;\'></i>Scan untuk Unduh Sertifikat</div>'">
+      </div>
+      <h4><i class="fas fa-certificate"></i> Unduh Sertifikat</h4>
+      <p>Scan QR code di atas untuk mengunduh sertifikat partisipasi dalam kegiatan PKM</p>
     </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1532649538693-f3a2ec1bf8bd?w=500" alt="Kegiatan 4">
-      <div class="gallery-overlay"><h4>Kunjungan Desa</h4></div>
-    </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=500" alt="Kegiatan 5">
-      <div class="gallery-overlay"><h4>Bakti Sosial</h4></div>
-    </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=500" alt="Kegiatan 6">
-      <div class="gallery-overlay"><h4>Diskusi Kelompok</h4></div>
-    </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=500" alt="Kegiatan 7">
-      <div class="gallery-overlay"><h4>Kegiatan Bersama</h4></div>
-    </div>
-    <div class="gallery-item fade-in">
-      <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=500" alt="Kegiatan 8">
-      <div class="gallery-overlay"><h4>Penutupan Acara</h4></div>
+    <div class="qr-item fade-in">
+      <div class="qr-placeholder">
+        <img src="qr-foto.jpg" alt="QR Code Foto" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-text\'><i class=\'fas fa-qrcode\' style=\'font-size:3rem; color:#cbd5e1; margin-bottom:10px; display:block;\'></i>Scan untuk Foto Kegiatan</div>'">
+      </div>
+      <h4><i class="fas fa-camera"></i> Foto Kegiatan</h4>
+      <p>Scan QR code di atas untuk melihat galeri foto dokumentasi seluruh rangkaian kegiatan PKM</p>
     </div>
   </div>
 </section>
 
-<!-- ABSENSI -->
+<!-- ABSENSI - UPDATED SESSIONS -->
 <section id="absensi">
   <div class="section-title fade-in">
     <h2>Absensi Peserta PKM</h2>
@@ -497,10 +481,11 @@ dengan bantuan Artificial Intelligence.
         <label><i class="fas fa-calendar-day"></i> Pilih Sesi Kegiatan</label>
         <select required>
           <option value="">-- Pilih Sesi --</option>
-          <option>Sesi 1 - Pembukaan & Materi Dasar</option>
-          <option>Sesi 2 - Workshop Praktis</option>
-          <option>Sesi 3 - Diskusi & Pendampingan</option>
-          <option>Sesi 4 - Evaluasi & Penutupan</option>
+          <option>Sesi 1 - Pengenalan Artificial Intelligence</option>
+          <option>Sesi 2 - Penggunaan AI Secara Aman dan Produktif</option>
+          <option>Sesi 3 - Pembuatan Dashboard Pelayanan dengan AI</option>
+          <option>Sesi 4 - Implementasi AI dalam Pelayanan Publik</option>
+          <option>Sesi 5 - Evaluasi dan Monitoring Program</option>
         </select>
       </div>
       <div class="form-group">
