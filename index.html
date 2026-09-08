@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Pelayanan Masyarakat & Antrean Digital</title>
+  <!-- SEO Tags -->
+  <meta name="description" content="Sistem Informasi Pelayanan Masyarakat terpadu dengan formulir digital pendaftaran, monitoring antrean real-time, dashboard petugas, dan laporan analitik otomatis.">
+  
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Chart.js for Reports -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Decorative background elements -->
+  <div class="bg-decor bg-decor-1"></div>
+  <div class="bg-decor bg-decor-2"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-section">
+        <i class="fa-solid fa-hotel-asterisk"></i>
+        <div>
+          <div class="logo-title">SIPELMAS</div>
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; color: var(--text-muted-dark); text-transform: uppercase;" id="header-subtitle">Pelayanan Masyarakat Digital</span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn-nav active" data-target="portal"><i class="fa-solid fa-house"></i> Portal</button>
+        <button class="btn-nav" data-target="pendaftaran"><i class="fa-solid fa-file-signature"></i> Pendaftaran</button>
+        <button class="btn-nav" data-target="monitor"><i class="fa-solid fa-tv"></i> Monitor Antrean</button>
+        <button class="btn-nav" data-target="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard Petugas</button>
+        
+        <button class="theme-toggle" id="theme-btn" title="Ganti Tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- 1. PORTAL VIEW -->
+    <div id="view-portal" class="view-panel active">
+      <div class="text-center" style="margin-bottom: 40px;">
+        <h1 style="font-size: 40px; margin-bottom: 12px; font-weight: 800;">Sistem Pendaftaran Pelayanan Masyarakat</h1>
+        <p style="color: var(--text-muted-dark); max-width: 600px; margin: 0 auto; font-size: 16px;" class="dynamic-muted-text">
+          Selamat datang di portal pelayanan digital terpadu. Silakan pilih menu di bawah ini untuk memulai pendaftaran atau mengelola antrean pelayanan.
+        </p>
+      </div>
+
+      <div class="portal-grid">
+        <div class="card portal-card" onclick="switchView('pendaftaran')">
+          <div class="portal-icon"><i class="fa-solid fa-wpforms"></i></div>
+          <h3>Formulir Digital</h3>
+          <p class="dynamic-muted-text" style="font-size: 14px; color: var(--text-muted-dark);">Pendaftaran pelayanan secara mandiri oleh masyarakat. Cepat, mudah, dan langsung mendapatkan nomor antrean.</p>
+        </div>
+        
+        <div class="card portal-card" onclick="switchView('monitor')">
+          <div class="portal-icon"><i class="fa-solid fa-display"></i></div>
+          <h3>Monitor Antrean</h3>
+          <p class="dynamic-muted-text" style="font-size: 14px; color: var(--text-muted-dark);">Tampilan layar publik untuk memantau panggilan antrean aktif yang sedang berjalan di ruang tunggu.</p>
+        </div>
+        
+        <div class="card portal-card" onclick="switchView('dashboard')">
+          <div class="portal-icon"><i class="fa-solid fa-user-tie"></i></div>
+          <h3>Dashboard Petugas</h3>
+          <p class="dynamic-muted-text" style="font-size: 14px; color: var(--text-muted-dark);">Panel pengelolaan pendaftaran bagi petugas loket, pemanggilan suara antrean, dan pelaporan otomatis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. FORMULIR PENDAFTARAN VIEW -->
+    <div id="view-pendaftaran" class="view-panel">
+      <div class="flex-between mb-20">
+        <div>
+          <h2><i class="fa-solid fa-file-pen" style="color: var(--primary); margin-right: 10px;"></i>Formulir Pendaftaran Pelayanan</h2>
+          <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 14px;">Lengkapi data diri Anda di bawah ini secara benar untuk mendapatkan nomor antrean digital.</p>
+        </div>
+        <button class="btn-nav" data-target="portal"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      </div>
+
+      <div class="form-layout">
+        <!-- Form Card -->
+        <div class="card">
+          <form id="registration-form">
+            <div class="form-group">
+              <label for="reg-nik">Nomor Identitas (NIK) <span style="color: var(--danger);">*</span></label>
+              <input type="text" id="reg-nik" class="form-control" placeholder="Masukkan 16 digit NIK Anda" required minlength="16" maxlength="16" pattern="\d{16}" title="NIK harus berupa 16 digit angka">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-nama">Nama Lengkap <span style="color: var(--danger);">*</span></label>
+              <input type="text" id="reg-nama" class="form-control" placeholder="Masukkan nama sesuai KTP" required>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-layanan">Jenis Layanan Pelayanan <span style="color: var(--danger);">*</span></label>
+              <select id="reg-layanan" class="form-control" required>
+                <option value="" disabled selected>-- Pilih Layanan Pelayanan --</option>
+                <option value="Administrasi Kependudukan">Administrasi Kependudukan (KTP/KK)</option>
+                <option value="Sertifikasi & Perizinan">Sertifikasi & Perizinan Usaha</option>
+                <option value="Kesehatan & Sosial">Jaminan Kesehatan & Bantuan Sosial</option>
+                <option value="Pengaduan & Informasi">Pengaduan & Pusat Informasi</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-hp">Nomor HP / WhatsApp <span style="color: var(--danger);">*</span></label>
+              <input type="tel" id="reg-hp" class="form-control" placeholder="Contoh: 081234567890" required pattern="^08[0-9]{8,11}$" title="Nomor HP harus diawali dengan 08 dan memiliki panjang 10-13 digit">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-tanggal">Tanggal Pendaftaran</label>
+              <input type="date" id="reg-tanggal" class="form-control" readonly>
+            </div>
+
+            <button type="submit" class="btn-submit"><i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i> Daftar Pelayanan & Dapatkan Antrean</button>
+          </form>
+        </div>
+
+        <!-- Ticket Card Area -->
+        <div class="card ticket-preview">
+          <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-ticket" style="color: var(--primary); margin-right: 8px;"></i>Tiket Antrean Anda</h3>
+          
+          <div id="no-ticket-message" class="text-center" style="padding: 20px;">
+            <i class="fa-solid fa-qrcode" style="font-size: 64px; color: var(--border-color-dark); margin-bottom: 15px;"></i>
+            <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 14px;">Belum ada pendaftaran. Silakan isi dan kirimkan formulir untuk menerbitkan tiket antrean.</p>
+          </div>
+
+          <div id="printable-ticket" class="ticket" style="display: none;">
+            <div class="ticket-header">Tiket Pelayanan Publik</div>
+            <div style="font-weight: 500; font-size: 12px; color: var(--text-muted-dark);" id="ticket-service-title" class="dynamic-muted-text">LAYANAN A</div>
+            
+            <div class="ticket-divider"></div>
+            
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-muted-dark); text-transform: uppercase;">Nomor Antrean Anda</span>
+            <div class="ticket-number" id="ticket-queue-number">A-001</div>
+            
+            <div class="ticket-divider"></div>
+            
+            <div class="ticket-info-row">
+              <span class="ticket-label">Nama:</span>
+              <span class="ticket-value" id="ticket-name">-</span>
+            </div>
+            <div class="ticket-info-row">
+              <span class="ticket-label">NIK:</span>
+              <span class="ticket-value" id="ticket-nik">-</span>
+            </div>
+            <div class="ticket-info-row">
+              <span class="ticket-label">Tanggal:</span>
+              <span class="ticket-value" id="ticket-date">-</span>
+            </div>
+            <div class="ticket-info-row">
+              <span class="ticket-label">Waktu:</span>
+              <span class="ticket-value" id="ticket-time">-</span>
+            </div>
+            
+            <button class="btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Cetak Tiket</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MONITOR ANTREAN VIEW -->
+    <div id="view-monitor" class="view-panel">
+      <div class="flex-between mb-20">
+        <div>
+          <h2><i class="fa-solid fa-tv" style="color: var(--primary); margin-right: 10px;"></i>Monitor Panggilan Antrean</h2>
+          <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 14px;">Layar Monitor Publik Ruang Tunggu Pelayanan.</p>
+        </div>
+        <button class="btn-nav" data-target="portal"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      </div>
+
+      <div class="monitor-layout">
+        <!-- Active Call Screen -->
+        <div class="card active-call-card">
+          <div class="counter-badge">PANGGILAN AKTIF</div>
+          <div class="active-number" id="monitor-active-number">--</div>
+          
+          <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;" id="monitor-active-name">TIDAK ADA PANGGILAN AKTIF</div>
+          <div style="font-size: 15px; color: var(--text-muted-dark);" id="monitor-active-service" class="dynamic-muted-text">Silakan menunggu pemanggilan dari petugas loket</div>
+          
+          <!-- Sound wave indicator during Speech -->
+          <div class="sound-wave mt-20" id="monitor-sound-wave">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <span style="font-size: 12px; font-weight: 600; margin-left: 5px; color: var(--primary);">Menyuara...</span>
+          </div>
+        </div>
+
+        <!-- Waiting Lists and Stats Summary -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Loket status lists -->
+          <div class="card" style="flex-grow: 1;">
+            <h3 style="border-bottom: 1px solid var(--border-color-dark); padding-bottom: 10px; margin-bottom: 15px;">
+              <i class="fa-solid fa-users-line" style="color: var(--success); margin-right: 8px;"></i>Daftar Tunggu Antrean
+            </h3>
+            
+            <div id="monitor-waiting-list" style="max-height: 350px; overflow-y: auto;">
+              <!-- Dynamic waiting lists will be rendered here -->
+              <div class="text-center" style="padding: 30px; color: var(--text-muted-dark);" class="dynamic-muted-text">
+                <i class="fa-solid fa-smile-beam" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <p>Semua antrean telah dilayani atau kosong.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DASHBOARD PETUGAS VIEW -->
+    <div id="view-dashboard" class="view-panel">
+      <!-- Top header for Dashboard -->
+      <div class="flex-between mb-20">
+        <div>
+          <h2><i class="fa-solid fa-chart-line" style="color: var(--primary); margin-right: 10px;"></i>Dashboard Petugas Pelayanan</h2>
+          <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 14px;">Kelola pendaftaran masuk, panggil nomor antrean, dan pantau analitik pelayanan.</p>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-ctrl" id="btn-export-csv" onclick="exportToCSV()"><i class="fa-solid fa-file-csv"></i> Ekspor Laporan CSV</button>
+          <button class="btn-ctrl" style="border-color: rgba(239, 68, 68, 0.4); color: var(--danger);" onclick="confirmResetDatabase()"><i class="fa-solid fa-trash-can"></i> Reset Data</button>
+        </div>
+      </div>
+
+      <!-- KPI statistics cards -->
+      <div class="dashboard-grid">
+        <div class="card stat-card">
+          <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total-queue">0</div>
+            <div class="stat-label">Total Antrean</div>
+          </div>
+        </div>
+        
+        <div class="card stat-card">
+          <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-waiting">0</div>
+            <div class="stat-label">Menunggu</div>
+          </div>
+        </div>
+        
+        <div class="card stat-card">
+          <div class="stat-icon" style="background: var(--info-light); color: var(--info);"><i class="fa-solid fa-bullhorn"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-serving">0</div>
+            <div class="stat-label">Melayani</div>
+          </div>
+        </div>
+        
+        <div class="card stat-card">
+          <div class="stat-icon" style="background: var(--success-light); color: var(--success);"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-completed">0</div>
+            <div class="stat-label">Selesai</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Panel & Current Active Queue Controller -->
+      <div class="control-panel-grid">
+        <!-- Call Controller Card -->
+        <div class="card call-controls">
+          <h3 style="border-bottom: 1px solid var(--border-color-dark); padding-bottom: 10px; margin-bottom: 15px;">
+            <i class="fa-solid fa-circle-play" style="color: var(--primary); margin-right: 8px;"></i>Kontrol Antrean Aktif
+          </h3>
+          
+          <div class="call-display">
+            <div style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted-dark); margin-bottom: 10px;" class="dynamic-muted-text">SEDANG DIPROSES / DIPANGGIL</div>
+            <div id="dash-active-number" style="font-size: 64px; font-weight: 800; color: var(--primary); margin-bottom: 10px;">--</div>
+            <div id="dash-active-name" style="font-weight: 700; font-size: 18px;">Tidak Ada Antrean Aktif</div>
+            <div id="dash-active-service" style="font-size: 13px; color: var(--text-muted-dark); margin-top: 5px;" class="dynamic-muted-text">Klik "Panggil Berikutnya" untuk memulai pelayanan</div>
+            
+            <div class="sound-wave mt-20" id="dash-sound-wave" style="align-self: center;">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <span style="font-size: 12px; font-weight: 600; margin-left: 5px; color: var(--primary);">Menyuara...</span>
+            </div>
+          </div>
+
+          <div class="btn-action-group">
+            <button class="btn-ctrl btn-call-next" onclick="callNextQueue()"><i class="fa-solid fa-forward-step"></i> PANGGIL BERIKUTNYA</button>
+            <button class="btn-ctrl" onclick="recallActiveQueue()"><i class="fa-solid fa-volume-high"></i> Panggil Ulang</button>
+            <button class="btn-ctrl" onclick="serveActiveQueue()"><i class="fa-solid fa-user-gear"></i> Mulai Melayani</button>
+            <button class="btn-ctrl" style="border-color: rgba(16, 185, 129, 0.4); color: var(--success);" onclick="completeActiveQueue()"><i class="fa-solid fa-check"></i> Selesai Pelayanan</button>
+            <button class="btn-ctrl" style="border-color: rgba(239, 68, 68, 0.4); color: var(--danger);" onclick="cancelActiveQueue()"><i class="fa-solid fa-xmark"></i> Batal / Lewati</button>
+          </div>
+        </div>
+
+        <!-- Add Mock Data (For demonstration ease) -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="border-bottom: 1px solid var(--border-color-dark); padding-bottom: 10px; margin-bottom: 15px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--info); margin-right: 8px;"></i>Simulasi Data Pelayanan
+            </h3>
+            <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 14px; margin-bottom: 20px;">
+              Untuk memudahkan evaluasi dashboard dan laporan otomatis, Anda dapat membuat 10 data simulasi acak dengan tombol di bawah ini.
+            </p>
+          </div>
+          
+          <button class="btn-submit" style="background: linear-gradient(135deg, var(--info) 0%, #06b6d4 100%);" onclick="generateMockData()"><i class="fa-solid fa-bolt" style="margin-right: 8px;"></i> Generate 10 Data Pendaftaran Acak</button>
+        </div>
+      </div>
+
+      <!-- Main Data Table and Filter tools -->
+      <div class="card">
+        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-list-check" style="color: var(--primary); margin-right: 10px;"></i>Daftar Seluruh Pendaftaran</h3>
+        
+        <div class="filter-row">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="table-search" class="form-control" placeholder="Cari berdasarkan nama / NIK..." onkeyup="filterTable()">
+          </div>
+          
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="filter-layanan" class="form-control" style="width: auto; min-width: 180px;" onchange="filterTable()">
+              <option value="">Semua Layanan</option>
+              <option value="Administrasi Kependudukan">Administrasi Kependudukan</option>
+              <option value="Sertifikasi & Perizinan">Sertifikasi & Perizinan</option>
+              <option value="Kesehatan & Sosial">Kesehatan & Sosial</option>
+              <option value="Pengaduan & Informasi">Pengaduan & Informasi</option>
+            </select>
+
+            <select id="filter-status" class="form-control" style="width: auto; min-width: 150px;" onchange="filterTable()">
+              <option value="">Semua Status</option>
+              <option value="Menunggu">Menunggu</option>
+              <option value="Dipanggil">Dipanggil</option>
+              <option value="Melayani">Melayani</option>
+              <option value="Selesai">Selesai</option>
+              <option value="Batal">Batal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>No. Antrean</th>
+                <th>Nama Lengkap</th>
+                <th>NIK</th>
+                <th>Jenis Layanan</th>
+                <th>No. HP</th>
+                <th>Tanggal</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="registration-table-body">
+              <!-- Dynamically populated rows -->
+              <tr>
+                <td colspan="8" class="text-center" style="color: var(--text-muted-dark); padding: 30px;">
+                  Belum ada data pendaftaran pelayanan.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LAPORAN OTOMATIS SECTION -->
+      <div class="reports-grid">
+        <!-- Chart 1: Layanan Distribution -->
+        <div class="card">
+          <h3><i class="fa-solid fa-chart-pie" style="color: var(--primary); margin-right: 8px;"></i>Distribusi Jenis Layanan</h3>
+          <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 13px; margin-bottom: 20px;">Laporan proporsi pendaftaran berdasarkan divisi pelayanan.</p>
+          <div class="chart-container">
+            <canvas id="chart-service-distribution"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Status Distribution -->
+        <div class="card">
+          <h3><i class="fa-solid fa-chart-column" style="color: var(--success); margin-right: 8px;"></i>Statistik Status Pelayanan</h3>
+          <p class="dynamic-muted-text" style="color: var(--text-muted-dark); font-size: 13px; margin-bottom: 20px;">Laporan realisasi pelayanan berdasarkan siklus antrean.</p>
+          <div class="chart-container">
+            <canvas id="chart-status-breakdown"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Notification Banner -->
+  <div id="toast-notification" class="toast">
+    <i id="toast-icon" class="fa-solid fa-circle-check" style="font-size: 18px; color: var(--success);"></i>
+    <span id="toast-message">Notifikasi baru telah masuk!</span>
+  </div>
+
+  <footer style="margin-top: auto; padding: 24px; border-top: 1px solid var(--border-color-dark); text-align: center; font-size: 13px; color: var(--text-muted-dark);" class="dynamic-muted-text">
+    <div class="container">
+      &copy; 2026 SIPELMAS - Sistem Pelayanan Masyarakat Digital. Dirancang untuk keunggulan operasional publik.
+    </div>
+  </footer>
+
+  <!-- App logic JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
