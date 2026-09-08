@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Proyek Computer Vision - Deteksi Benda Real-Time Berbasis YOLOv8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --gray-light: #94a3b8;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            color: var(--dark);
+            background: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 6rem 2rem 4rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 900px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 700px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 2rem 0 1rem;
+        }
+
+        .card p {
+            color: var(--gray);
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        /* Video Section */
+        .video-section {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .video-container {
+            position: relative;
+            max-width: 900px;
+            margin: 2rem auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            background: #000;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .video-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        .video-placeholder p {
+            color: var(--gray-light);
+            font-size: 1.1rem;
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        table th {
+            color: white;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--dark);
+        }
+
+        table tbody tr {
+            transition: background 0.3s;
+        }
+
+        table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: var(--shadow-md);
+        }
+
+        .code-block::before {
+            content: 'Code';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 0 16px 0 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .code-block pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+        .code-block .comment {
+            color: #64748b;
+        }
+
+        .code-block .keyword {
+            color: #c084fc;
+        }
+
+        .code-block .string {
+            color: #86efac;
+        }
+
+        .code-block .function {
+            color: #60a5fa;
+        }
+
+        /* List Styling */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .styled-list li {
+            padding: 1rem 0 1rem 2.5rem;
+            position: relative;
+            color: var(--gray);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .styled-list li:last-child {
+            border-bottom: none;
+        }
+
+        .styled-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+
+        /* Workflow Diagram */
+        .workflow-diagram {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* Alert Box */
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .alert-text {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-text {
+            color: var(--gray-light);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .video-section {
+                padding: 1.5rem;
+            }
+
+            .video-placeholder {
+                height: 300px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-slide-left {
+            animation: slideInLeft 0.6s ease forwards;
+        }
+
+        .animate-slide-right {
+            animation: slideInRight 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>YOLO Vision</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#video">Video</a></li>
+                <li><a href="#pendahuluan">Pendahuluan</a></li>
+                <li><a href="#spesifikasi">Spesifikasi</a></li>
+                <li><a href="#tahapan">Tahapan</a></li>
+                <li><a href="#arsitektur">Arsitektur</a></li>
+                <li><a href="#kode">Kode</a></li>
+                <li><a href="#panduan">Panduan</a></li>
+                <li><a href="#kesimpulan">Kesimpulan</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-award"></i> Production-Ready Project
+            </div>
+            <h1>Laporan Proyek Computer Vision</h1>
+            <p class="hero-subtitle">Deteksi Benda Real-Time Berbasis YOLOv8</p>
+            <p class="hero-description">
+                Dengan Feedback Suara Bahasa Indonesia menggunakan Speech Application Programming Interface (SAPI5)
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">🤖</div>
+                    <div class="stat-label">Model AI</div>
+                    <div class="stat-value">YOLOv8 Nano</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔊</div>
+                    <div class="stat-label">Teknologi Suara</div>
+                    <div class="stat-value">Windows SAPI5</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💻</div>
+                    <div class="stat-label">Framework</div>
+                    <div class="stat-value">Python + OpenCV</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Status</div>
+                    <div class="stat-value">Berhasil Diuji</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Video Section -->
+        <section id="video" class="video-section">
+            <div style="position: relative; z-index: 1;">
+                <div class="section-header">
+                    <div class="section-number"><i class="fas fa-video"></i></div>
+                    <h2 class="section-title" style="color: white;">Video Demonstrasi Program</h2>
+                    <p class="section-subtitle" style="color: rgba(255,255,255,0.8);">
+                        Lihat program yolo_suara.py yang sedang berjalan dan mendeteksi berbagai benda secara real-time
+                    </p>
+                </div>
+
+                <div class="video-container">
+                    <!-- Ganti 'video_demo.mp4' dengan nama file video Anda -->
+                    <video controls poster="">
+                        <source src="video_demo.mp4" type="video/mp4">
+                        Browser Anda tidak mendukung tag video.
+                    </video>
+                </div>
+
+                <div class="alert alert-info" style="margin-top: 2rem;">
+                    <div class="alert-icon">📝</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Catatan Penting</div>
+                        <div class="alert-text">
+                            Untuk menampilkan video, simpan file video demonstrasi dengan nama <code style="background: rgba(0,0,0,0.2); padding: 0.2rem 0.5rem; border-radius: 4px;">video_demo.mp4</code> di folder yang sama dengan file HTML ini, atau ubah atribut <code style="background: rgba(0,0,0,0.2); padding: 0.2rem 0.5rem; border-radius: 4px;">src</code> pada tag video sesuai dengan lokasi file video Anda.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="color: white;"><i class="fas fa-list-ul"></i> Ringkasan Video Demonstrasi</h3>
+                    <ul class="styled-list">
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:00 - 00:19</strong> — Program diinisialisasi, model YOLOv8 dimuat, dan kamera webcam diaktifkan</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:19 - 00:26</strong> — Deteksi botol air mineral (Botol) dengan akurasi tinggi (0.85-0.96)</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:26 - 00:30</strong> — Deteksi gunting (Gunting) dengan akurasi 0.67-0.87</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:30 - 00:40</strong> — Deteksi gelas berisi air (Gelas) dengan akurasi 0.27-0.44</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:40 - 00:56</strong> — Deteksi buku "TinyML" (Buku) dengan akurasi 0.27-0.51</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">00:56 - 01:12</strong> — Deteksi handphone dan botol secara bersamaan</li>
+                        <li style="color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.1);"><strong style="color: var(--primary-light);">01:12 - 01:47</strong> — Demonstrasi deteksi berbagai benda secara bergantian</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAB I: Pendahuluan -->
+        <section id="pendahuluan" class="section">
+            <div class="section-header">
+                <div class="section-number">I</div>
+                <h2 class="section-title">Pendahuluan</h2>
+                <p class="section-subtitle">Latar belakang, tujuan, dan ruang lingkup proyek computer vision ini</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-book-open" style="color: var(--primary);"></i> 1.1 Latar Belakang</h3>
+                <p>Perkembangan teknologi Computer Vision (Visi Komputer) dalam beberapa tahun terakhir telah melahirkan berbagai arsitektur jaringan saraf tiruan (deep learning) yang mampu mendeteksi dan mengklasifikasikan objek secara instan. Salah satu model state-of-the-art paling populer dan efisien di industri saat ini adalah YOLO (You Only Look Once), khususnya varian YOLOv8 yang dikembangkan oleh Ultralytics. YOLOv8 terkenal karena kecepatannya yang sangat tinggi tanpa mengorbankan akurasi mean Average Precision (mAP).</p>
+                <p>Meskipun deteksi visual pada layar komputer sangat informatif, pada implementasi dunia nyata—seperti sistem pemantauan ruang kerja, alat bantu tuna netra (assistive technology), maupun asisten pintar—pengguna sering kali tidak dapat memantau monitor secara terus-menerus. Oleh karena itu, diperlukan integrasi modalitas feedback lain yang bersifat auditif (suara). Dengan menggabungkan deteksi visual kamera dan Text-to-Speech (TTS) offline berbahasa Indonesia, sistem dapat langsung mengumumkan nama benda yang tertangkap di depan kamera tanpa mengharuskan pengguna memandang layar.</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-bullseye" style="color: var(--secondary);"></i> 1.2 Tujuan Proyek</h3>
+                <p>Tujuan utama dari perancangan dan pembuatan skrip yolo_suara.py adalah:</p>
+                <ul class="styled-list">
+                    <li>Membangun sistem deteksi objek real-time menggunakan webcam laptop/komputer dengan model YOLOv8 Nano</li>
+                    <li>Memfilter dan memetakan objek-objek umum di area meja kerja (seperti handphone, jam, buku, laptop, botol, dll.) ke dalam nama Bahasa Indonesia</li>
+                    <li>Mengintegrasikan mesin Text-to-Speech (TTS) bawaan Windows (SAPI5) yang bekerja 100% offline, gratis, dan tanpa ketergantungan koneksi internet</li>
+                    <li>Menerapkan arsitektur asynchronous non-blocking dan mekanisme speech cooldown timer agar video stream webcam tetap berjalan mulus (60+ FPS) tanpa mengalami freeze/stuttering saat komputer berbicara</li>
+                    <li>Menyederhanakan penamaan label (seperti mengubah 'clock/watch' menjadi 'Jam') untuk menghasilkan artikulasi suara yang jernih dan mudah dipahami pengguna</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-th-large" style="color: var(--accent);"></i> 1.3 Ruang Lingkup Sistem</h3>
+                <p>Sistem ini difokuskan pada pengenalan objek-objek yang lazim ditemukan di atas meja kerja berdasarkan bobot pretrained model COCO (Common Objects in Context). Tabel berikut merinci daftar kelas objek yang dikonfigurasi dalam sistem:</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Label COCO (English)</th>
+                                <th>Terjemahan / Suara (Bahasa Indonesia)</th>
+                                <th>Alasan & Konfigurasi Khusus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>cell phone</strong></td>
+                                <td>Handphone</td>
+                                <td>Objek primer di meja kerja; deteksi cepat & presisi</td>
+                            </tr>
+                            <tr>
+                                <td><strong>clock / watch</strong></td>
+                                <td>Jam</td>
+                                <td>Penyebutan disederhanakan menjadi 'Jam' agar artikulasi TTS Windows terdengar sangat jernih dan tegas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>book</strong></td>
+                                <td>Buku</td>
+                                <td>Buku catatan, modul referensi, maupun dokumen di atas meja</td>
+                            </tr>
+                            <tr>
+                                <td><strong>laptop</strong></td>
+                                <td>Laptop</td>
+                                <td>Perangkat komputer jinjing di area pengujian</td>
+                            </tr>
+                            <tr>
+                                <td><strong>mouse / keyboard</strong></td>
+                                <td>Mouse / Keyboard</td>
+                                <td>Aksesoris komputer kerja standar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>bottle / cup</strong></td>
+                                <td>Botol / Gelas</td>
+                                <td>Wadah minuman di meja kerja</td>
+                            </tr>
+                            <tr>
+                                <td><strong>scissors</strong></td>
+                                <td>Gunting</td>
+                                <td>Peralatan tulis dan kantor</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAB II: Spesifikasi -->
+        <section id="spesifikasi" class="section">
+            <div class="section-header">
+                <div class="section-number">II</div>
+                <h2 class="section-title">Spesifikasi dan Kebutuhan Sistem</h2>
+                <p class="section-subtitle">Persyaratan hardware, software, dan dependencies untuk menjalankan sistem</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-microchip" style="color: var(--primary);"></i> 2.1 Kebutuhan Perangkat Keras (Hardware)</h3>
+                <p>Untuk menjalankan sistem ini secara optimal tanpa kendala lag, spesifikasi minimum yang direkomendasikan adalah sebagai berikut:</p>
+                <ul class="styled-list">
+                    <li><strong>Prosesor (CPU):</strong> Intel Core i3 / AMD Ryzen 3 atau lebih tinggi</li>
+                    <li><strong>Kartu Grafis (GPU):</strong> Opsional (Bisa berjalan mulus di CPU murni berkat efisiensi YOLOv8 Nano)</li>
+                    <li><strong>Kamera:</strong> Webcam internal laptop (resolusi 720p) atau Webcam USB eksternal</li>
+                    <li><strong>Audio:</strong> Speaker internal atau headphone/earphone untuk mendengarkan keluaran suara TTS</li>
+                    <li><strong>Memori (RAM):</strong> Minimal 4 GB (disarankan 8 GB ke atas)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-compact-disc" style="color: var(--secondary);"></i> 2.2 Kebutuhan Perangkat Lunak (Software)</h3>
+                <p>Sistem dibangun di atas ekosistem Python modern pada platform sistem operasi Windows. Komponen perangkat lunak meliputi:</p>
+                <ul class="styled-list">
+                    <li><strong>Sistem Operasi:</strong> Microsoft Windows 10 atau Windows 11 (64-bit)</li>
+                    <li><strong>Runtime Python:</strong> Python versi 3.10 atau 3.11</li>
+                    <li><strong>Editor Kode / IDE:</strong> Visual Studio Code, PyCharm, atau terminal PowerShell</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-code" style="color: var(--accent);"></i> 2.3 Daftar Pustaka Python (Dependencies)</h3>
+                <p>Proyek ini menggunakan kombinasi pustaka khusus untuk visi komputer, machine learning, dan audio native:</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Pustaka</th>
+                                <th>Fungsi Utama dalam Proyek</th>
+                                <th>Catatan Penting</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>ultralytics</strong></td>
+                                <td>Framework resmi model YOLOv8 untuk memuat weight yolov8n.pt dan melakukan inferensi deteksi objek</td>
+                                <td>Mengunduh otomatis model saat pertama kali dieksekusi jika file belum ada</td>
+                            </tr>
+                            <tr>
+                                <td><strong>opencv-python (cv2)</strong></td>
+                                <td>Menangkap stream video dari webcam, memproses frame citra, menggambar bounding box hijau dan teks label di layar</td>
+                                <td>Pondasi utama penanganan visual real-time</td>
+                            </tr>
+                            <tr>
+                                <td><strong>pywin32 (win32com.client)</strong></td>
+                                <td>Menghubungkan Python dengan Microsoft Speech API (SAPI5) secara native untuk menghasilkan suara Text-to-Speech</td>
+                                <td>Berjalan secara lokal/offline tanpa kuota internet atau API key</td>
+                            </tr>
+                            <tr>
+                                <td><strong>time</strong></td>
+                                <td>Pustaka built-in Python untuk mengelola timestamp dan menghitung jeda waktu cooldown suara</td>
+                                <td>Mencegah suara bertabrakan atau berulang terlalu cepat</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-success">
+                    <div class="alert-icon">💡</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Keunggulan SAPI5 untuk Deteksi Real-Time</div>
+                        <div class="alert-text">
+                            Pustaka pywin32 menyediakan akses langsung ke Windows SAPI5 (Speech Application Programming Interface). Berbeda dengan pustaka pihak ketiga seperti gTTS (Google Text-to-Speech) yang membutuhkan koneksi internet dan menghasilkan file MP3 sementara, SAPI5 sepenuhnya bekerja secara in-memory dan offline.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAB III: Tahapan -->
+        <section id="tahapan" class="section">
+            <div class="section-header">
+                <div class="section-number">III</div>
+                <h2 class="section-title">Tahapan Pembuatan dari Awal</h2>
+                <p class="section-subtitle">Panduan step-by-step untuk membangun lingkungan proyek dari nol</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-folder-plus" style="color: var(--primary);"></i> Langkah 1: Membuat Direktori Proyek</h3>
+                <p>Buat sebuah folder kerja baru di komputer Anda, misalnya pada direktori Test Yolo. Buka terminal (PowerShell atau Command Prompt) dan arahkan ke folder tersebut:</p>
+                <div class="code-block">
+                    <pre><span class="keyword">mkdir</span> <span class="string">"Test Yolo"</span>
+<span class="keyword">cd</span> <span class="string">"Test Yolo"</span></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-vial" style="color: var(--secondary);"></i> Langkah 2: Menyiapkan Virtual Environment Python</h3>
+                <p>Membuat virtual environment bertujuan untuk mengisolasi pustaka proyek agar tidak terjadi konflik versi dengan modul Python global:</p>
+                <div class="code-block">
+                    <pre><span class="keyword">python</span> -m venv venv
+.\venv\Scripts\activate</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-download" style="color: var(--accent);"></i> Langkah 3: Menginstal Seluruh Dependensi</h3>
+                <p>Jalankan perintah pip berikut di dalam terminal untuk menginstal pustaka YOLOv8, OpenCV, dan antarmuka COM Windows:</p>
+                <div class="code-block">
+                    <pre><span class="keyword">pip</span> install --upgrade pip
+<span class="keyword">pip</span> install ultralytics opencv-python pywin32</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-brain" style="color: var(--primary);"></i> Langkah 4: Menyiapkan Bobot Model YOLOv8</h3>
+                <p>Model yolov8n.pt (Nano) adalah varian model YOLOv8 paling ringan (~6.2 MB) yang sangat cocok untuk inferensi CPU berkecepatan tinggi. Ketika skrip Python mengeksekusi sintaks YOLO('yolov8n.pt'), library Ultralytics akan otomatis mengunduh bobot resmi dari repositori GitHub Ultralytics ke direktori kerja saat pertama kali dijalankan.</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-file-code" style="color: var(--secondary);"></i> Langkah 5: Membuat File Skrip yolo_suara.py</h3>
+                <p>Buat file baru bernama yolo_suara.py di dalam folder proyek tersebut menggunakan text editor atau IDE pilihan Anda, lalu masukkan arsitektur kode deteksi objek dan sistem audio.</p>
+            </div>
+        </section>
+
+        <!-- BAB IV: Arsitektur -->
+        <section id="arsitektur" class="section">
+            <div class="section-header">
+                <div class="section-number">IV</div>
+                <h2 class="section-title">Arsitektur dan Desain Sistem</h2>
+                <p class="section-subtitle">Diagram alur kerja dan penjelasan teknis arsitektur sistem</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-project-diagram" style="color: var(--primary);"></i> 4.1 Diagram Alur Kerja (Workflow Diagram)</h3>
+                <p>Sistem beroperasi melalui siklus pemrosesan frame (frame-by-frame loop) yang terstruktur. Diagram alur berikut menggambarkan urutan logika kerja yolo_suara.py:</p>
+                
+                <div class="workflow-diagram">
++-------------------------------------------------------------+
+|                 1. INISIALISASI SISTEM                      |
+|  - Load Windows SAPI5 SpVoice Engine (Set Speed/Rate = -2)  |
+|  - Set GLOBAL_SPEECH_COOLDOWN = 3.5 Detik                   |
+|  - Inisialisasi Model YOLOv8 Nano (yolov8n.pt)              |
+|  - Inisialisasi Kamera Webcam (cv2.VideoCapture(0))         |
++-------------------------------------------------------------+
+                               |
+                               v
++-------------------------------------------------------------+
+|                 2. CAPTURE FRAME WEBCAM                     |
+|  - Baca frame citra menggunakan cap.read()                  |
+|  - Jika gagal baca frame -> Break loop                      |
++-------------------------------------------------------------+
+                               |
+                               v
++-------------------------------------------------------------+
+|                 3. INFERENSI MODEL YOLOV8                   |
+|  - Model memprediksi objek pada frame (Confidence >= 0.25)   |
+|  - Ekstraksi Bounding Box (xyxy), Class ID, Confidence      |
++-------------------------------------------------------------+
+                               |
+                               v
++-------------------------------------------------------------+
+|              4. FILTER & PEMETAAN OBJEK MEJA                |
+|  - Apakah kelas ada di DIRECT_YOLO_MAPPING?                 |
+|    [TIDAK] -> Abaikan (contoh: 'person', 'chair', dll.)     |
+|    [YA]    -> Terjemahkan nama ke Bahasa Indonesia          |
+|               Gambar kotak hijau & label teks di frame      |
+|               Tambahkan ke himpunan detected_in_this_frame  |
++-------------------------------------------------------------+
+                               |
+                               v
++-------------------------------------------------------------+
+|            5. EKSEKUSI SUARA ASYNCHRONOUS (SAPI5)           |
+|  - Apakah (waktu_sekarang - last_speech_time) >= 3.5 detik? |
+|    [YA]    -> Ucapkan nama benda secara Async (Flag 1)      |
+|               Update last_speech_time                       |
+|    [TIDAK] -> Tunda penyebutan agar tidak bising / spam     |
++-------------------------------------------------------------+
+                               |
+                               v
++-------------------------------------------------------------+
+|            6. DISPLAY FRAME & DETEKSI KEYBOARD              |
+|  - Tampilkan jendela cv2.imshow("Deteksi Benda Meja")       |
+|  - Jika tombol 'q' ditekan -> Keluar dari loop              |
+|  - Lepaskan kamera (release) & tutup semua jendela          |
++-------------------------------------------------------------+
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-bolt" style="color: var(--warning);"></i> 4.2 Mengatasi Masalah Latensi Audio (Non-Blocking TTS)</h3>
+                <p>Tantangan terbesar dalam menggabungkan Computer Vision dengan Text-to-Speech adalah latensi I/O audio. Pada pendekatan konvensional menggunakan sintaks synchronous (seperti pyttsx3.runAndWait() atau SAPI5 Speak mode blocking), prosesor video akan terhenti (freeze) selama mesin audio sedang membaca kata. Jika mesin membaca kata selama 2 detik, maka video kamera akan membeku selama 2 detik.</p>
+                <p>Solusi yang diterapkan pada skrip yolo_suara.py adalah memanfaatkan parameter flags=1 pada metode Speak SAPI5:</p>
+                <div class="code-block">
+                    <pre>tts_speaker.Speak(text_to_say, 1)  <span class="comment"># 1 melambangkan SPF_ASYNC</span></pre>
+                </div>
+                <p>Flag bernilai 1 ini memerintahkan sistem operasi Windows untuk memutar audio pada thread latar belakang terpisah (background worker thread), sehingga thread utama OpenCV dapat langsung melanjutkan pembacaan frame kamera berikutnya pada milidetik yang sama tanpa ada penurunan FPS.</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-clock" style="color: var(--accent);"></i> 4.3 Mekanisme Speech Cooldown Timer</h3>
+                <p>Ketika sebuah benda (misalnya handphone) diletakkan di atas meja, objek tersebut akan terdeteksi di setiap frame kamera (30-60 kali per detik). Jika suara dipicu pada setiap frame, sistem akan mengalami penumpukan antrean audio (audio stuttering / voice spam) yang sangat mengganggu.</p>
+                <p>Untuk mengatasi hal ini, diterapkan variabel GLOBAL_SPEECH_COOLDOWN sebesar 3.5 detik. Sistem mencatat timestamp time.time() terakhir kali suara dikeluarkan, dan menolak pemanggilan suara baru hingga selisih waktu telah melampaui 3.5 detik. Durasi ini terbukti ideal untuk memberi jeda alami pada percakapan.</p>
+            </div>
+        </section>
+
+        <!-- BAB V: Kode -->
+        <section id="kode" class="section">
+            <div class="section-header">
+                <div class="section-number">V</div>
+                <h2 class="section-title">Pembahasan Kode Program Lengkap</h2>
+                <p class="section-subtitle">Kode sumber lengkap dan bedah teknis setiap bagian program</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-code" style="color: var(--primary);"></i> Kode Sumber Lengkap yolo_suara.py</h3>
+                <div class="code-block">
+                    <pre><span class="keyword">import</span> cv2
+<span class="keyword">import</span> time
+<span class="keyword">import</span> win32com.client
+<span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO
+
+<span class="comment"># ==========================================</span>
+<span class="comment"># INISIALISASI AUDIO (WINDOWS SAPI5 NATIVE)</span>
+<span class="comment"># ==========================================</span>
+<span class="keyword">try</span>:
+    tts_speaker = win32com.client.Dispatch(<span class="string">"SAPI.SpVoice"</span>)
+    <span class="comment"># Kecepatan suara santai & jelas (-2)</span>
+    tts_speaker.Rate = -2
+    print(<span class="string">"[AUDIO] Engine Windows SAPI5 TTS Aktif."</span>)
+<span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+    print(<span class="string">f"[AUDIO ERROR] Gagal mengaktifkan SAPI5: {e}"</span>)
+    tts_speaker = <span class="keyword">None</span>
+
+<span class="comment"># Jeda waktu global antar penyebutan benda (3.5 detik)</span>
+GLOBAL_SPEECH_COOLDOWN = 3.5
+last_global_speech_time = 0
+
+<span class="keyword">def</span> <span class="function">play_sound</span>(text_to_say):
+    <span class="string">"""
+    Mengucapkan nama benda secara async dengan jeda waktu global (3.5 detik).
+    """</span>
+    <span class="keyword">global</span> last_global_speech_time
+    current_time = time.time()
+
+    <span class="keyword">if</span> current_time - last_global_speech_time >= GLOBAL_SPEECH_COOLDOWN:
+        print(<span class="string">f"[🔊 SUARA] PC Bersuara: '{text_to_say}'"</span>)
+        <span class="keyword">if</span> tts_speaker:
+            <span class="keyword">try</span>:
+                tts_speaker.Speak(text_to_say, 1) <span class="comment"># 1 = Async</span>
+            <span class="keyword">except</span> Exception <span class="keyword">as</span> err:
+                print(<span class="string">f"[AUDIO ERROR] Gagal bicara: {err}"</span>)
+        last_global_speech_time = current_time
+
+<span class="comment"># ==========================================</span>
+<span class="comment"># PEMETAAN BENDA DI MEJA DARI DATASET COCO YOLOV8N</span>
+<span class="comment"># ==========================================</span>
+DIRECT_YOLO_MAPPING = {
+    <span class="comment"># 1. Handphone</span>
+    <span class="string">'cell phone'</span>: <span class="string">'Handphone'</span>,
+
+    <span class="comment"># 2. Jam (Disederhanakan menjadi "Jam" agar suara TTS diucapkan sangat jelas)</span>
+    <span class="string">'clock'</span>: <span class="string">'Jam'</span>,
+    <span class="string">'watch'</span>: <span class="string">'Jam'</span>,
+
+    <span class="comment"># 3. Buku</span>
+    <span class="string">'book'</span>: <span class="string">'Buku'</span>,
+
+    <span class="comment"># Benda Meja Umum Lainnya</span>
+    <span class="string">'laptop'</span>: <span class="string">'Laptop'</span>,
+    <span class="string">'mouse'</span>: <span class="string">'Mouse'</span>,
+    <span class="string">'keyboard'</span>: <span class="string">'Keyboard'</span>,
+    <span class="string">'bottle'</span>: <span class="string">'Botol'</span>,
+    <span class="string">'cup'</span>: <span class="string">'Gelas'</span>,
+    <span class="string">'scissors'</span>: <span class="string">'Gunting'</span>
+}
+
+<span class="comment"># ==========================================</span>
+<span class="comment"># PROGRAM UTAMA WEBCAM REAL-TIME</span>
+<span class="comment"># ==========================================</span>
+<span class="keyword">def</span> <span class="function">main</span>():
+    print(<span class="string">"\n=================================================="</span>)
+    print(<span class="string">"    DETEKSI BENDA MEJA (YOLOV8N) + SUARA INDONESIA"</span>)
+    print(<span class="string">"=================================================="</span>)
+    print(<span class="string">"Memuat model YOLOv8..."</span>)
+
+    <span class="keyword">try</span>:
+        model = YOLO(<span class="string">"yolov8n.pt"</span>)
+        print(<span class="string">"[BERHASIL] Model YOLOv8 Standar Aktif!"</span>)
+    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+        print(<span class="string">f"[ERROR] Gagal memuat model YOLO: {e}"</span>)
+        <span class="keyword">return</span>
+
+    <span class="comment"># Inisialisasi Kamera Web Utama (0)</span>
+    print(<span class="string">"\nMembuka kamera webcam..."</span>)
+    cap = cv2.VideoCapture(0)
+
+    <span class="keyword">if not</span> cap.isOpened():
+        print(<span class="string">"[ERROR] Kamera webcam tidak dapat diakses!"</span>)
+        <span class="keyword">return</span>
+
+    print(<span class="string">"\n[BERHASIL] Kamera Aktif!"</span>)
+    print(<span class="string">"--> Penyebutan Jam Tangan telah diubah menjadi 'Jam' agar diucapkan jernih."</span>)
+    print(<span class="string">"--> Tekan 'q' pada jendela video untuk keluar.\n"</span>)
+
+    <span class="keyword">while</span> <span class="keyword">True</span>:
+        ret, frame = cap.read()
+        <span class="keyword">if not</span> ret:
+            print(<span class="string">"[ERROR] Gagal mengambil gambar dari kamera."</span>)
+            <span class="keyword">break</span>
+
+        <span class="comment"># Deteksi dengan YOLO (confidence 0.25)</span>
+        results = model.predict(frame, conf=0.25, verbose=<span class="keyword">False</span>)
+
+        detected_in_this_frame = <span class="keyword">set</span>()
+
+        <span class="keyword">for</span> result <span class="keyword">in</span> results:
+            boxes = result.boxes
+            <span class="keyword">for</span> box <span class="keyword">in</span> boxes:
+                cls_id = <span class="keyword">int</span>(box.cls[0])
+                class_name = model.names[cls_id].lower()
+                conf = <span class="keyword">float</span>(box.conf[0])
+
+                <span class="keyword">if</span> class_name <span class="keyword">in</span> DIRECT_YOLO_MAPPING:
+                    indonesian_name = DIRECT_YOLO_MAPPING[class_name]
+                    detected_in_this_frame.add(indonesian_name)
+
+                    x1, y1, x2, y2 = <span class="keyword">map</span>(<span class="keyword">int</span>, box.xyxy[0])
+
+                    <span class="comment"># Gambar Bounding Box Hijau & Label Indonesia</span>
+                    label = <span class="string">f"{indonesian_name} ({conf:.2f})"</span>
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                    cv2.putText(
+                        frame,
+                        label,
+                        (x1, <span class="keyword">max</span>(30, y1 - 10)),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 255, 0),
+                        2
+                    )
+
+                    print(<span class="string">f"[DETEKSI] Terdeteksi: '{class_name}' -> '{indonesian_name}' (Akurasi: {conf:.2f})"</span>)
+
+        <span class="comment"># Bersuara untuk objek terdeteksi</span>
+        <span class="keyword">for</span> obj_name <span class="keyword">in</span> detected_in_this_frame:
+            play_sound(obj_name)
+
+        <span class="comment"># Petunjuk layar</span>
+        cv2.putText(
+            frame,
+            <span class="string">"Benda Meja: Handphone, Jam, Buku, Laptop, Botol, Gelas | 'q' Exit"</span>,
+            (10, 25),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 255, 255),
+            1
+        )
+
+        cv2.imshow(<span class="string">"Deteksi Benda Meja (YOLOv8 Standar)"</span>, frame)
+
+        <span class="keyword">if</span> cv2.waitKey(1) & 0xFF == <span class="keyword">ord</span>(<span class="string">'q'</span>):
+            print(<span class="string">"\nProgram dihentikan oleh pengguna."</span>)
+            <span class="keyword">break</span>
+
+    cap.release()
+    cv2.destroyAllWindows()
+    print(<span class="string">"Selesai."</span>)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    main()</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-search" style="color: var(--secondary);"></i> 5.1 Bedah Teknis Baris Kode</h3>
+                
+                <h4>A. Baris 1 - 4: Import Modul</h4>
+                <p>Modul cv2 menyediakan fungsi pengolahan citra dan penampil video. Modul time digunakan untuk perhitungan selisih detik. win32com.client mengaktifkan antarmuka COM Windows untuk berkomunikasi dengan voice engine SAPI5. Sedangkan from ultralytics import YOLO memuat modul deep learning YOLO.</p>
+
+                <h4>B. Baris 7 - 16: Inisialisasi SAPI5 & Pengaturan Kecepatan</h4>
+                <p>win32com.client.Dispatch('SAPI.SpVoice') memanggil instance COM suara native Windows. Nilai tts_speaker.Rate diatur ke -2. Nilai negatif ini memperlambat tempo ucapan sedikit agar setiap suku kata dalam Bahasa Indonesia terdengar lebih tegas, tenang, dan tidak terburu-buru.</p>
+
+                <h4>C. Baris 19 - 37: Fungsi play_sound() dan Cooldown</h4>
+                <p>Fungsi play_sound menerima argumen nama benda yang akan disuarakan. Logika current_time - last_global_speech_time >= 3.5 memastikan jeda antar kata minimal 3.5 detik. Parameter kedua pada tts_speaker.Speak(text_to_say, 1) bernilai 1 (SVSFlagsAsync), yang menjamin perintah suara langsung kembali tanpa memblokir thread video.</p>
+
+                <h4>D. Baris 41 - 59: Dictionary DIRECT_YOLO_MAPPING</h4>
+                <p>Kamus ini berfungsi ganda: sebagai whitelist (hanya objek dalam kamus ini yang diproses, mengabaikan objek lain seperti 'person' atau 'chair') sekaligus sebagai translasi bahasa ke Bahasa Indonesia. Sebagai catatan khusus, kelas 'clock' dan 'watch' sengaja dipetakan menjadi 'Jam' agar pelafalan fonetik Windows terdengar sempurna tanpa aksen kaku.</p>
+
+                <h4>E. Baris 64 - 87: Inisialisasi Model & Kamera</h4>
+                <p>Fungsi main() memuat model('yolov8n.pt') dan membuka cv2.VideoCapture(0). Indeks 0 merepresentasikan kamera default Windows. Dilakukan pengecekan kondisi cap.isOpened() untuk mencegah error crash jika webcam sedang digunakan oleh aplikasi lain.</p>
+
+                <h4>F. Baris 89 - 148: Loop Pemrosesan Citra Real-Time</h4>
+                <p>Setiap putaran membaca frame citra dari kamera. model.predict(frame, conf=0.25, verbose=False) melakukan forward pass deteksi objek dengan ambang keyakinan (confidence threshold) 25%. Hasil deteksi yang lolos filter digambari kotak persegi hijau (0, 255, 0) dengan ketebalan 3 piksel dan teks label. Himpunan detected_in_this_frame digunakan agar nama objek yang sama hanya disuarakan satu kali per frame.</p>
+
+                <h4>G. Baris 149 - 155: Terminasi dan Pembersihan Memori</h4>
+                <p>Ketika pengguna menekan tombol 'q' (cv2.waitKey(1) & 0xFF == ord('q')), perulangan berhenti. cap.release() membebaskan perangkat keras webcam dari penguncian memori, dan cv2.destroyAllWindows() menutup seluruh jendela grafis.</p>
+            </div>
+        </section>
+
+        <!-- BAB VI: Panduan -->
+        <section id="panduan" class="section">
+            <div class="section-header">
+                <div class="section-number">VI</div>
+                <h2 class="section-title">Panduan Menjalankan dan Pengujian</h2>
+                <p class="section-subtitle">Cara menjalankan program dan troubleshooting jika terjadi masalah</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-play-circle" style="color: var(--primary);"></i> 6.1 Cara Menjalankan Program</h3>
+                <p>Untuk menjalankan sistem, buka terminal PowerShell atau Command Prompt pada direktori folder kerja, pastikan virtual environment aktif, lalu ketik perintah:</p>
+                <div class="code-block">
+                    <pre><span class="keyword">python</span> yolo_suara.py</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-terminal" style="color: var(--secondary);"></i> 6.2 Tampilan Log Terminal Saat Berjalan Normal</h3>
+                <p>Ketika program dimulai, terminal akan mencetak informasi inisialisasi, status deteksi benda, dan notifikasi saat audio diaktifkan:</p>
+                <div class="code-block">
+                    <pre>[AUDIO] Engine Windows SAPI5 TTS Aktif.
+
+==================================================
+    DETEKSI BENDA MEJA (YOLOV8N) + SUARA INDONESIA
+==================================================
+Memuat model YOLOv8...
+[BERHASIL] Model YOLOv8 Standar Aktif!
+
+Membuka kamera webcam...
+
+[BERHASIL] Kamera Aktif!
+--> Penyebutan Jam Tangan telah diubah menjadi 'Jam' agar diucapkan jernih.
+--> Tekan 'q' pada jendela video untuk keluar.
+
+[DETEKSI] Terdeteksi: 'cell phone' -> 'Handphone' (Akurasi: 0.88)
+[🔊 SUARA] PC Bersuara: 'Handphone'
+[DETEKSI] Terdeteksi: 'clock' -> 'Jam' (Akurasi: 0.74)
+[🔊 SUARA] PC Bersuara: 'Jam'
+[DETEKSI] Terdeteksi: 'book' -> 'Buku' (Akurasi: 0.82)
+[ SUARA] PC Bersuara: 'Buku'</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-hand-pointer" style="color: var(--accent);"></i> 6.3 Petunjuk Interaksi Pengguna</h3>
+                <ul class="styled-list">
+                    <li><strong>Arahkan Benda ke Kamera:</strong> Dekatkan benda (seperti smartphone, jam tangan, buku, atau botol minum) ke depan lensa webcam</li>
+                    <li><strong>Indikator Visual:</strong> Bounding box warna hijau terang akan mengunci objek secara otomatis dan menampilkan tingkat akurasi (misal: 'Handphone (0.88)')</li>
+                    <li><strong>Indikator Audio:</strong> Speaker komputer akan mengucapkan nama benda dalam Bahasa Indonesia secara santai</li>
+                    <li><strong>Menghentikan Program:</strong> Klik jendela video kamera, lalu tekan tombol huruf 'q' pada keyboard</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-wrench" style="color: var(--warning);"></i> 6.4 Penanganan Kendala (Troubleshooting Guide)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Gejala Masalah</th>
+                                <th>Kemungkinan Penyebab</th>
+                                <th>Solusi Langkah Perbaikan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Webcam tidak dapat diakses</strong></td>
+                                <td>Webcam sedang dipakai aplikasi lain (Zoom/Teams/Browser) atau indeks kamera bukan 0</td>
+                                <td>Tutup aplikasi lain yang mengakses kamera. Jika menggunakan webcam eksternal USB, ubah cv2.VideoCapture(0) menjadi cv2.VideoCapture(1)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Error pada modul win32com (SAPI5)</strong></td>
+                                <td>Instalasi pywin32 belum menjalankan skrip post-install Windows</td>
+                                <td>Jalankan perintah di terminal: python Scripts\pywin32_postinstall.py -install atau perbarui dengan pip install --upgrade pywin32</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Suara tidak keluar sama sekali</strong></td>
+                                <td>Volume Windows mute atau perangkat output audio default belum terpilih</td>
+                                <td>Periksa volume sistem Windows di taskbar pojok kanan bawah. Pastikan speaker aktif</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAB VII: Kesimpulan -->
+        <section id="kesimpulan" class="section">
+            <div class="section-header">
+                <div class="section-number">VII</div>
+                <h2 class="section-title">Kesimpulan dan Rekomendasi</h2>
+                <p class="section-subtitle">Hasil akhir proyek dan saran pengembangan di masa mendatang</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> 7.1 Kesimpulan</h3>
+                <p>Berdasarkan hasil perancangan, implementasi, dan pengujian program yolo_suara.py, dapat disimpulkan bahwa:</p>
+                <ul class="styled-list">
+                    <li>Model YOLOv8 Nano (yolov8n.pt) terbukti sangat handal dan ringan untuk mendeteksi berbagai benda meja kerja secara real-time pada perangkat komputer standar tanpa memerlukan GPU diskrit berkemampuan tinggi</li>
+                    <li>Integrasi antarmuka COM Windows SAPI5 menyediakan solusi Text-to-Speech yang efisien, tanpa biaya, dan bekerja 100% offline</li>
+                    <li>Penerapan parameter asynchronous (flag 1) berhasil mengeliminasi stuttering/lag pada tampilan kamera, sehingga streaming video tetap berjalan mulus pada kecepatan frame penuh</li>
+                    <li>Mekanisme cooldown timer (3.5 detik) dan penyederhanaan label menjadi 'Jam', 'Handphone', 'Buku', dan sejenisnya terbukti efektif menghasilkan feedback suara yang natural, jernih, dan tidak mengganggu</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-lightbulb" style="color: var(--warning);"></i> 7.2 Rekomendasi Pengembangan Lebih Lanjut</h3>
+                <p>Untuk pengembangan dan peningkatan kemampuan sistem di masa mendatang, disarankan beberapa inovasi berikut:</p>
+                <ul class="styled-list">
+                    <li><strong>Fine-Tuning Custom Dataset:</strong> Melakukan pelatihan model tambahan (custom training) untuk mengenali benda-benda meja yang lebih spesifik, seperti dompet, kartu identitas, kunci kendaraan, atau jenis obat tertentu</li>
+                    <li><strong>Estimasi Jarak & Posisi Objek:</strong> Menambahkan logika estimasi posisi koordinat relatif benda (kiri, tengah, kanan) pada layar kamera untuk diumumkan bersama nama benda (contoh: 'Handphone di sebelah kiri')</li>
+                    <li><strong>Deployment ke Perangkat Edge:</strong> Memigrasikan arsitektur ini ke perangkat mini PC seperti Raspberry Pi atau NVIDIA Jetson Nano untuk dijadikan perangkat portabel (kacamata pintar atau kalung pintar tuna netra)</li>
+                    <li>Proyek ini memiliki potensi besar untuk dikembangkan menjadi aplikasi pintar, seperti kursi roda pintar atau alat bantu portabel lainnya, yang dirancang khusus untuk memandu penyandang tunanetra dalam berjalan di lingkungan sekitar secara mandiri dan aman</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-robot"></i> YOLO Vision Project
+            </div>
+            <p class="footer-text">Laporan Proyek Computer Vision - Deteksi Benda Real-Time Berbasis YOLOv8</p>
+            <p class="footer-text">Dengan Feedback Suara Bahasa Indonesia (SAPI5)</p>
+            <p class="footer-text" style="margin-top: 1rem; opacity: 0.6;">© 2026 - Dokumentasi Proyek</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
+
+            // Navbar effect
+            const navbar = document.getElementById('navbar');
+            if (scrollTop > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (scrollTop > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+
+            // Section animations
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollTop > sectionTop - window.innerHeight + sectionHeight / 3) {
+                    section.classList.add('visible');
+                }
+            });
+        });
+
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Trigger initial animation
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.section').forEach((section, index) => {
+                setTimeout(() => {
+                    section.classList.add('visible');
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
