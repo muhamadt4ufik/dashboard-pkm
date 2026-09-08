@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)https://dashboard-pkm.netlify.app/dashboard_2 -->
+<html lang="id" data-theme="light"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=3da4461b-7918-45d3-8c37-31eb089394f0
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=3da4461b-7918-45d3-8c37-31eb089394f0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Dashboard Interaktif Kependudukan &amp; Wilayah Kecamatan Tambun Selatan - PKM</title>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./Dashboard_2_files/css2" rel="stylesheet">
+    <link rel="stylesheet" href="./Dashboard_2_files/all.min.css">
+
+    <!-- Leaflet.js CSS & JS -->
+    <link rel="stylesheet" href="./Dashboard_2_files/leaflet.css">
+    <script src="./Dashboard_2_files/leaflet.js.download"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="./Dashboard_2_files/chart.umd.min.js.download"></script>
+
+    <!-- Canvas Confetti for Celebration Animation -->
+    <script src="./Dashboard_2_files/confetti.browser.min.js.download"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-header: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #090d16;
+            --bg-card: #111827;
+            --bg-header: linear-gradient(135deg, #030712 0%, #0f172a 60%, #1e1b4b 100%);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-light: #6b7280;
+            --border-color: #1f2937;
+            --primary-light: rgba(37, 99, 235, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 30px rgba(0,0,0,0.5);
+            --glass-bg: rgba(17, 24, 39, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px 16px 40px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ================= RUNNING ANNOUNCEMENT TICKER ================= */
+        .ticker-wrap {
+            background: linear-gradient(90deg, #1e3a8a, #2563eb, #3b82f6);
+            color: #ffffff;
+            border-radius: var(--radius-sm);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .ticker-badge {
+            background: #ef4444;
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.03); }
+        }
+
+        .ticker-move {
+            white-space: nowrap;
+            display: inline-block;
+            animation: tickerSlide 28s linear infinite;
+        }
+
+        .ticker-move:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes tickerSlide {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ================= HEADER BANNER ================= */
+        .header-banner {
+            background: var(--bg-header);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-30px, 20px) scale(1.1); }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-badge {
+            width: 68px;
+            height: 68px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #60a5fa;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+
+        .logo-badge:hover {
+            transform: rotate(6deg) scale(1.05);
+        }
+
+        .header-titles h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .header-titles p {
+            font-size: 13.5px;
+            color: #93c5fd;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .header-titles p span.badge-pkm {
+            background: rgba(16, 185, 129, 0.25);
+            color: #6ee7b7;
+            border: 1px solid rgba(110, 231, 183, 0.4);
+            padding: 2px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-action.btn-primary-action {
+            background: #2563eb;
+            border-color: #60a5fa;
+        }
+
+        .btn-action.btn-primary-action:hover {
+            background: #1d4ed8;
+        }
+
+        /* Metric Cards inside Header */
+        .header-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 18px 22px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+
+        .metric-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .metric-icon.blue { background: rgba(59, 130, 246, 0.35); color: #93c5fd; }
+        .metric-icon.green { background: rgba(16, 185, 129, 0.35); color: #6ee7b7; }
+        .metric-icon.amber { background: rgba(245, 158, 11, 0.35); color: #fde047; }
+        .metric-icon.purple { background: rgba(139, 92, 246, 0.35); color: #c4b5fd; }
+
+        .metric-info .val {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .metric-info .lbl {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* ================= FILTER BAR & CONTROLS ================= */
+        .controls-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .select-custom {
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .select-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 14px 9px 38px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            background-color: var(--bg-card);
+        }
+
+        /* Quick Filter Chips */
+        .quick-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .chip-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip-btn:hover, .chip-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* ================= TABS NAVIGATION ================= */
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-body);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        /* ================= TAB CONTENTS ================= */
+        .tab-pane {
+            display: none;
+            animation: slideUpFade 0.35s ease-in-out forwards;
+        }
+
+        .tab-pane.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= GRID & CARDS ================= */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-half {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2, .grid-half, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* ================= MAP STYLING ================= */
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            z-index: 1;
+        }
+
+        .map-layer-toggles {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .map-layer-toggles label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* ================= DESA RANKING LIST ================= */
+        .desa-rank-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 440px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .desa-rank-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .desa-rank-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+            background: var(--primary-light);
+        }
+
+        .rank-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .rank-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .rank-stat {
+            text-align: right;
+        }
+
+        .rank-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* ================= TABLES ================= */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+
+        .custom-table th {
+            background-color: var(--bg-body);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 16px;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .custom-table th:hover {
+            color: var(--primary);
+        }
+
+        .custom-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .custom-table tr:hover td {
+            background-color: var(--primary-light);
+        }
+
+        .badge-type {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-kelurahan {
+            background: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge-desa {
+            background: rgba(37, 99, 235, 0.15);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-table-action {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-table-action:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* ================= CHART CONTAINER ================= */
+        .chart-wrapper {
+            position: relative;
+            height: 290px;
+            width: 100%;
+        }
+
+        /* ================= SIMULATOR MODULE STYLING ================= */
+        .sim-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sim-form-group label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .sim-input {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .sim-input:focus {
+            border-color: var(--primary);
+            background: var(--bg-card);
+        }
+
+        .sim-result-box {
+            background: var(--primary-light);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* ================= COMPARISON MODULE STYLING ================= */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .comp-col {
+            background: var(--bg-body);
+            padding: 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .comp-header {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* ================= MODAL DIALOG ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: slideUpFade 0.2s ease;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: var(--bg-header);
+            color: #ffffff;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 78vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            background: var(--bg-body);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 22px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .close-btn:hover { opacity: 1; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .detail-box {
+            background: var(--bg-body);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-box .d-lbl { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .detail-box .d-val { font-size: 16px; font-weight: 800; color: var(--text-main); margin-top: 4px; }
+
+        .pkm-card {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-body);
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+        }
+
+        .pkm-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pkm-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .ticker-wrap, .header-actions, .controls-bar, .tab-navigation, .btn-table-action { display: none !important; }
+            .tab-pane { display: block !important; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <!-- ================= RUNNING ANNOUNCEMENT TICKER ================= -->
+    <div class="ticker-wrap">
+        <span class="ticker-badge">PENGUMUMAN PKM</span>
+        <div class="ticker-move">
+            📢 <b>Kantor Kecamatan Tambun Selatan:</b> Program Posyandu Lansia Keliling Desa Sumberjaya &amp; Jatimulya | Pelatihan Digital UMKM Usia Produktif Desa Mangunjaya | Pendataan Stunting Balita Tahun 2025 | Digitalisasi Desa Terpadu.
+        </div>
+    </div>
+
+    <!-- ================= HEADER BANNER ================= -->
+    <header class="header-banner">
+        <div class="header-top">
+            <div class="brand-info">
+                <div class="logo-badge">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div class="header-titles">
+                    <h1>Kecamatan Tambun Selatan</h1>
+                    <p>
+                        <span>Kabupaten Bekasi • Jawa Barat</span>
+                        <span class="badge-pkm">Super Dashboard Interaktif PKM</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn-action" id="themeToggleBtn" onclick="toggleTheme()">
+                    <i class="fa-solid fa-moon"></i> <span id="themeText">Dark Mode</span>
+                </button>
+                <button class="btn-action" onclick="exportDataCSV()">
+                    <i class="fa-solid fa-file-csv"></i> Export CSV
+                </button>
+                <button class="btn-action btn-primary-action" onclick="triggerConfettiReport()">
+                    <i class="fa-solid fa-print"></i> Cetak Laporan
+                </button>
+            </div>
+        </div>
+
+        <!-- Metric Summary Bar -->
+        <div class="header-metrics">
+            <div class="metric-card">
+                <div class="metric-icon blue"><i class="fa-solid fa-users"></i></div>
+                <div class="metric-info">
+                    <div class="val" id="metricTotalPenduduk">458.616</div>
+                    <div class="lbl">Total Penduduk (Jiwa)</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon green"><div style="font-weight: 800; font-size: 18px;">10</div></div>
+                <div class="metric-info">
+                    <div class="val">1 Kel. &amp; 9 Desa</div>
+                    <div class="lbl">Total Wilayah Administrasi</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon amber"><i class="fa-solid fa-user-gear"></i></div>
+                <div class="metric-info">
+                    <div class="val" id="metricProduktif">311.859</div>
+                    <div class="lbl">Usia Produktif (15-64 th)</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon purple"><i class="fa-solid fa-person-cane"></i></div>
+                <div class="metric-info">
+                    <div class="val" id="metricLansia">32.104</div>
+                    <div class="lbl">Kelompok Lansia (65+ th)</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CONTROLS & FILTER BAR ================= -->
+    <div class="controls-bar">
+        <div class="filter-group">
+            <label for="filterTahun"><i class="fa-regular fa-calendar-check"></i> Filter Tahun Data:</label>
+            <select id="filterTahun" class="select-custom" onchange="handleYearChange(this.value)">
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025" selected="">2025 (Estimasi Disdukcapil)</option>
+            </select>
+        </div>
+
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="globalSearchInput" class="search-input" placeholder="Cari desa, kelurahan, statistik..." onkeyup="filterGlobalSearch(this.value)">
+        </div>
+
+        <div class="quick-chips">
+            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">Quick Filter:</span>
+            <button class="chip-btn active" onclick="applyQuickFilter(&#39;all&#39;, this)">Semua (10)</button>
+            <button class="chip-btn" onclick="applyQuickFilter(&#39;dense&#39;, this)">Terpadat (&gt;15k/km²)</button>
+            <button class="chip-btn" onclick="applyQuickFilter(&#39;lansia&#39;, this)">Lansia Tinggi (&gt;3.5k)</button>
+            <button class="chip-btn" onclick="applyQuickFilter(&#39;kelurahan&#39;, this)">Status Kelurahan</button>
+        </div>
+    </div>
+
+    <!-- ================= TABS NAVIGATION ================= -->
+    <nav class="tab-navigation">
+        <button class="nav-btn active" onclick="switchTab(&#39;tabMap&#39;, this)">
+            <i class="fa-solid fa-map-location-dot"></i> Peta Wilayah Interaktif
+        </button>
+        <button class="nav-btn" onclick="switchTab(&#39;tabDemography&#39;, this)">
+            <i class="fa-solid fa-chart-pie"></i> Demografi &amp; Piramida
+        </button>
+        <button class="nav-btn" onclick="switchTab(&#39;tabSimulator&#39;, this)">
+            <i class="fa-solid fa-calculator"></i> Simulator Program PKM
+        </button>
+        <button class="nav-btn" onclick="switchTab(&#39;tabCompare&#39;, this)">
+            <i class="fa-solid fa-code-compare"></i> Komparasi Desa Side-by-Side
+        </button>
+        <button class="nav-btn" onclick="switchTab(&#39;tabVillages&#39;, this)">
+            <i class="fa-solid fa-table-list"></i> Tabel Data Desa
+        </button>
+    </nav>
+
+    <!-- ================= TAB 1: PETA & GEOGRAFIS ================= -->
+    <section id="tabMap" class="tab-pane active">
+        <div class="grid-2">
+            <!-- Left Map Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-map"></i> Peta Wilayah &amp; Multi-Layer GIS Tambun Selatan
+                    </div>
+                    <div class="map-layer-toggles">
+                        <label><input type="checkbox" id="layerFacilityChk" onchange="toggleFacilityMarkers()" checked=""> 🏥 Fasilitas Umum</label>
+                        <label><input type="checkbox" id="layerBoundaryChk" onchange="toggleBoundaryPolygon()" checked=""> 🗺️ Batas Kecamatan</label>
+                    </div>
+                </div>
+
+                <div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="./Dashboard_2_files/4238.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(240px, 14px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4238(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(496px, 14px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4237.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(240px, -242px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4237(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(496px, -242px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(240px, 270px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4239(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(496px, 270px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4238(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-16px, 14px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4238(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(752px, 14px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4237(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-16px, -242px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4237(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(752px, -242px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4239(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-16px, 270px, 0px); opacity: 1;"><img alt="" src="./Dashboard_2_files/4239(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(752px, 270px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="1110" height="598" viewBox="-92 -50 1110 598" style="transform: translate3d(-92px, -50px, 0px);"><g><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6, 6" fill="#3b82f6" fill-opacity="0.06" fill-rule="evenodd" d="M258 55L695 73L724 466L288 495z"></path><path class="leaflet-interactive" stroke="#8b5cf6" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c4b5fd" fill-opacity="0.9" fill-rule="evenodd" d="M350,246a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#8b5cf6" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c4b5fd" fill-opacity="0.9" fill-rule="evenodd" d="M607,105a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#8b5cf6" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c4b5fd" fill-opacity="0.9" fill-rule="evenodd" d="M447,228a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#8b5cf6" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c4b5fd" fill-opacity="0.9" fill-rule="evenodd" d="M391,155a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#8b5cf6" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c4b5fd" fill-opacity="0.9" fill-rule="evenodd" d="M531,190a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M247,217a26,26 0 1,0 52,0 a26,26 0 1,0 -52,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M532,184a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M425,231a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M365,149a22,22 0 1,0 44,0 a22,22 0 1,0 -44,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M333,249a19,19 0 1,0 38,0 a19,19 0 1,0 -38,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M438,372a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M592,96a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M655,208a17,17 0 1,0 34,0 a17,17 0 1,0 -34,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M565,331a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 "></path><path class="leaflet-interactive" stroke="#2563eb" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#2563eb" fill-opacity="0.6" fill-rule="evenodd" d="M602,407a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 "></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(1.67216e+06px, 1.08516e+06px, 0px) scale(4096);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="https://dashboard-pkm.netlify.app/dashboard_2#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="https://dashboard-pkm.netlify.app/dashboard_2#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com/" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © OpenStreetMap contributors | Kantor Kecamatan Tambun Selatan</div></div></div></div>
+                
+                <div style="font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <span><i class="fa-solid fa-circle-info"></i> Klik pada lingkaran desa untuk melihat pop-up cepat dan detail program PKM.</span>
+                    <span><b>Luas Wilayah Total:</b> 33.25 km²</span>
+                </div>
+            </div>
+
+            <!-- Right Ranking & Stats Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-ranking-star"></i> Peringkat Kependudukan Desa
+                    </div>
+                </div>
+
+                <p style="font-size:12.5px; color:var(--text-muted);">Diurutkan berdasarkan total populasi penduduk (Tahun <span class="active-year-label">2025</span>):</p>
+                
+                <div class="desa-rank-list" id="rankListContainer"><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">1</div>
+                    <div>
+                        <div class="rank-name">Sumberjaya</div>
+                        <div class="rank-sub">Desa • 6.3 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">78.450</div>
+                    <div class="rank-sub">12.452 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">2</div>
+                    <div>
+                        <div class="rank-name">Jatimulya</div>
+                        <div class="rank-sub">Kelurahan • 3.2 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">68.540</div>
+                    <div class="rank-sub">21.419 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">3</div>
+                    <div>
+                        <div class="rank-name">Mangunjaya</div>
+                        <div class="rank-sub">Desa • 5.1 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">62.340</div>
+                    <div class="rank-sub">12.224 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">4</div>
+                    <div>
+                        <div class="rank-name">Setiamekar</div>
+                        <div class="rank-sub">Desa • 3.4 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">54.820</div>
+                    <div class="rank-sub">16.124 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">5</div>
+                    <div>
+                        <div class="rank-name">Setiadarma</div>
+                        <div class="rank-sub">Desa • 2.95 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">46.480</div>
+                    <div class="rank-sub">15.756 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">6</div>
+                    <div>
+                        <div class="rank-name">Mekarsari</div>
+                        <div class="rank-sub">Desa • 2.8 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">42.576</div>
+                    <div class="rank-sub">15.206 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">7</div>
+                    <div>
+                        <div class="rank-name">Tambun</div>
+                        <div class="rank-sub">Desa • 1.85 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">36.250</div>
+                    <div class="rank-sub">19.595 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">8</div>
+                    <div>
+                        <div class="rank-name">Tridayasakti</div>
+                        <div class="rank-sub">Desa • 3.15 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">32.890</div>
+                    <div class="rank-sub">10.441 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">9</div>
+                    <div>
+                        <div class="rank-name">Lambangsari</div>
+                        <div class="rank-sub">Desa • 2.4 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">21.420</div>
+                    <div class="rank-sub">8.925 jiwa/km²</div>
+                </div>
+            </div><div class="desa-rank-item">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">10</div>
+                    <div>
+                        <div class="rank-name">Lambangjaya</div>
+                        <div class="rank-sub">Desa • 2.1 km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">14.850</div>
+                    <div class="rank-sub">7.071 jiwa/km²</div>
+                </div>
+            </div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TAB 2: DEMOGRAFI & PIRAMIDA ================= -->
+    <section id="tabDemography" class="tab-pane">
+        <div class="grid-half">
+            <!-- Age Group Doughnut Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-chart-pie"></i> Proporsi Kelompok Usia Penduduk
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="ageGroupChart" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas>
+                </div>
+                <div style="display:flex; justify-content:space-around; font-size:13px; text-align:center; padding-top:8px; border-top:1px solid var(--border-color);">
+                    <div><span style="color:#3b82f6; font-weight:800;">●</span> Anak (0-14): <br><b id="valAnakStat">114.653</b></div>
+                    <div><span style="color:#10b981; font-weight:800;">●</span> Produktif (15-64): <br><b id="valProdStat">311.859</b></div>
+                    <div><span style="color:#f59e0b; font-weight:800;">●</span> Lansia (65+): <br><b id="valLansiaStat">32.104</b></div>
+                </div>
+            </div>
+
+            <!-- Population Pyramid Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-users-between-lines"></i> Piramida Penduduk (Laki-laki vs Perempuan)
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="popPyramidChart" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-half">
+            <!-- Radar Chart Indeks Desa Mandiri & IDM -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-chart-radar"></i> Radar Indeks Kemandirian &amp; Layanan Desa (IDM)
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="radarIDMChart" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas>
+                </div>
+            </div>
+
+            <!-- Growth Trend Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-chart-line"></i> Tren Pertumbuhan Penduduk (2020 - 2025)
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="growthTrendChart" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TAB 3: SIMULATOR PROGRAM PKM ================= -->
+    <section id="tabSimulator" class="tab-pane">
+        <div class="grid-2">
+            <!-- Simulator Controls Form -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-calculator"></i> Kalkulator Kebutuhan Program PKM
+                    </div>
+                </div>
+
+                <p style="font-size:13px; color:var(--text-muted);">
+                    Simulasikan alokasi anggaran, kebutuhan kader, dan proyeksi hasil untuk program Pengabdian Kepada Masyarakat di Kecamatan Tambun Selatan.
+                </p>
+
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="sim-form-group">
+                        <label for="simTargetDesa">Target Wilayah Intervensi PKM:</label>
+                        <select id="simTargetDesa" class="sim-input" onchange="runPKMSimulator()">
+                            <option value="all">Seluruh Kecamatan (10 Wilayah)</option>
+                            <option value="Sumberjaya">Desa Sumberjaya (Populasi Terbanyak)</option>
+                            <option value="Jatimulya">Kelurahan Jatimulya (Wilayah Perkotaan)</option>
+                            <option value="Mangunjaya">Desa Mangunjaya</option>
+                            <option value="Setiamekar">Desa Setiamekar</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-half">
+                        <div class="sim-form-group">
+                            <label for="simTargetLansia">Target Sasaran Lansia (Jiwa):</label>
+                            <input type="number" id="simTargetLansia" class="sim-input" value="1200" min="100" step="50" oninput="runPKMSimulator()">
+                        </div>
+
+                        <div class="sim-form-group">
+                            <label for="simTargetStunting">Target Sasaran Balita/Ibu (Jiwa):</label>
+                            <input type="number" id="simTargetStunting" class="sim-input" value="800" min="50" step="50" oninput="runPKMSimulator()">
+                        </div>
+                    </div>
+
+                    <div class="sim-form-group">
+                        <label for="simTargetVokasi">Target Peserta Pelatihan UMKM Usia Produktif (Jiwa):</label>
+                        <input type="number" id="simTargetVokasi" class="sim-input" value="350" min="20" step="10" oninput="runPKMSimulator()">
+                    </div>
+
+                    <button class="btn-action btn-primary-action" style="justify-content:center; padding:12px;" onclick="triggerSimComplete()">
+                        <i class="fa-solid fa-bolt"></i> Jalankan Simulasi &amp; Efek Selebrasi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulator Output Box -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-square-poll-vertical"></i> Proyeksi Hasil Simulasi PKM
+                    </div>
+                </div>
+
+                <div class="sim-result-box">
+                    <div>
+                        <div style="font-size:12px; color:var(--text-muted); font-weight:700;">ESTIMASI ANGGARAN KEGIATAN PKM</div>
+                        <div style="font-size:24px; font-weight:800; color:var(--primary);" id="simEstCost">Rp 48.500.000</div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:13px;">
+                        <div class="detail-box">
+                            <div class="d-lbl">Kebutuhan Kader / Relawan</div>
+                            <div class="d-val" id="simKaderVal">45 Orang</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="d-lbl">Paket PMT &amp; Kit Gizi</div>
+                            <div class="d-val" id="simPMTVal">800 Paket</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="d-lbl">Frekuensi Posyandu Lansia</div>
+                            <div class="d-val" id="simSesiLansia">24 Sesi</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="d-lbl">Batch Pelatihan UMKM</div>
+                            <div class="d-val" id="simBatchUMKM">7 Batch</div>
+                        </div>
+                    </div>
+
+                    <div style="border-top:1px solid rgba(37,99,235,0.2); padding-top:10px; font-size:12.5px; color:var(--text-main);">
+                        <b><i class="fa-solid fa-circle-check" style="color:var(--accent-green);"></i> Impact Score PKM:</b> <span id="simImpactScore">High Efficiency (94.2/100)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TAB 4: KOMPARASI DESA SIDE-BY-SIDE ================= -->
+    <section id="tabCompare" class="tab-pane">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-code-compare"></i> Modus Komparasi 2 Desa Berdampingan (Side-by-Side)
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <select id="compDesaA" class="select-custom" onchange="runDesaComparison()"><option value="Jatimulya" selected="">Kelurahan Jatimulya</option><option value="Tambun">Desa Tambun</option><option value="Setiadarma">Desa Setiadarma</option><option value="Setiamekar">Desa Setiamekar</option><option value="Mekarsari">Desa Mekarsari</option><option value="Mangunjaya">Desa Mangunjaya</option><option value="Sumberjaya">Desa Sumberjaya</option><option value="Tridayasakti">Desa Tridayasakti</option><option value="Lambangsari">Desa Lambangsari</option><option value="Lambangjaya">Desa Lambangjaya</option></select>
+                    <span style="align-self:center; font-weight:800;">VS</span>
+                    <select id="compDesaB" class="select-custom" onchange="runDesaComparison()"><option value="Jatimulya">Kelurahan Jatimulya</option><option value="Tambun">Desa Tambun</option><option value="Setiadarma">Desa Setiadarma</option><option value="Setiamekar">Desa Setiamekar</option><option value="Mekarsari">Desa Mekarsari</option><option value="Mangunjaya">Desa Mangunjaya</option><option value="Sumberjaya" selected="">Desa Sumberjaya</option><option value="Tridayasakti">Desa Tridayasakti</option><option value="Lambangsari">Desa Lambangsari</option><option value="Lambangjaya">Desa Lambangjaya</option></select>
+                </div>
+            </div>
+
+            <div class="comp-grid">
+                <!-- Column Desa A -->
+                <div class="comp-col" id="compColA">
+                <div class="comp-header">Kelurahan Jatimulya</div>
+                <div class="detail-box"><div class="d-lbl">Total Penduduk</div><div class="d-val">68.540 jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Luas Wilayah</div><div class="d-val">3.2 km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Kepadatan</div><div class="d-val">21.419 jiwa/km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Usia Produktif</div><div class="d-val" style="color:var(--accent-green);">46.607 jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Lansia (65+)</div><div class="d-val" style="color:var(--accent-amber);">4.798 jiwa</div></div>
+                <div class="pkm-card"><h4 style="font-size:12.5px;"><i class="fa-solid fa-lightbulb"></i> Fokus PKM:</h4><p style="font-size:12px;">Pemberdayaan Lansia &amp; digitalisasi posyandu kelurahan</p></div>
+            </div>
+
+                <!-- Column Desa B -->
+                <div class="comp-col" id="compColB">
+                <div class="comp-header">Desa Sumberjaya</div>
+                <div class="detail-box"><div class="d-lbl">Total Penduduk</div><div class="d-val">78.450 jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Luas Wilayah</div><div class="d-val">6.3 km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Kepadatan</div><div class="d-val">12.452 jiwa/km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Usia Produktif</div><div class="d-val" style="color:var(--accent-green);">53.346 jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Lansia (65+)</div><div class="d-val" style="color:var(--accent-amber);">5.492 jiwa</div></div>
+                <div class="pkm-card"><h4 style="font-size:12.5px;"><i class="fa-solid fa-lightbulb"></i> Fokus PKM:</h4><p style="font-size:12px;">Layanan gizi anak balita &amp; senam seimbang lansia</p></div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TAB 5: DAFTAR DESA ================= -->
+    <section id="tabVillages" class="tab-pane">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-list-check"></i> Data Tabel Kependudukan 1 Kelurahan &amp; 9 Desa
+                </div>
+                <div>
+                    <button class="btn-action btn-primary-action" style="padding:6px 14px; font-size:12px;" onclick="exportDataCSV()">
+                        <i class="fa-solid fa-download"></i> Unduh Tabel (.CSV)
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table" id="villagesDataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">No</th>
+                            <th onclick="sortTable(1)">Nama Wilayah <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(2)">Tipe <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(3)">Luas (km²) <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(4)">Total Penduduk <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(5)">Kepadatan (jiwa/km²) <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(6)">Usia Produktif <i class="fa-solid fa-sort"></i></th>
+                            <th onclick="sortTable(7)">Lansia (65+) <i class="fa-solid fa-sort"></i></th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"><tr>
+                <td><b>1</b></td>
+                <td><b>Jatimulya</b></td>
+                <td><span class="badge-type badge-kelurahan">Kelurahan</span></td>
+                <td>3.20</td>
+                <td><b>68.540</b></td>
+                <td>21.419</td>
+                <td><span style="color:#10b981; font-weight:700;">46.607</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">4.798</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Jatimulya&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Jatimulya&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>2</b></td>
+                <td><b>Tambun</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>1.85</td>
+                <td><b>36.250</b></td>
+                <td>19.595</td>
+                <td><span style="color:#10b981; font-weight:700;">24.650</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">2.538</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Tambun&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Tambun&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>3</b></td>
+                <td><b>Setiadarma</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>2.95</td>
+                <td><b>46.480</b></td>
+                <td>15.756</td>
+                <td><span style="color:#10b981; font-weight:700;">31.606</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">3.254</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Setiadarma&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Setiadarma&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>4</b></td>
+                <td><b>Setiamekar</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>3.40</td>
+                <td><b>54.820</b></td>
+                <td>16.124</td>
+                <td><span style="color:#10b981; font-weight:700;">37.278</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">3.837</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Setiamekar&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Setiamekar&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>5</b></td>
+                <td><b>Mekarsari</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>2.80</td>
+                <td><b>42.576</b></td>
+                <td>15.206</td>
+                <td><span style="color:#10b981; font-weight:700;">28.952</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">2.980</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Mekarsari&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Mekarsari&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>6</b></td>
+                <td><b>Mangunjaya</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>5.10</td>
+                <td><b>62.340</b></td>
+                <td>12.224</td>
+                <td><span style="color:#10b981; font-weight:700;">42.391</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">4.364</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Mangunjaya&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Mangunjaya&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>7</b></td>
+                <td><b>Sumberjaya</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>6.30</td>
+                <td><b>78.450</b></td>
+                <td>12.452</td>
+                <td><span style="color:#10b981; font-weight:700;">53.346</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">5.492</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Sumberjaya&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Sumberjaya&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>8</b></td>
+                <td><b>Tridayasakti</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>3.15</td>
+                <td><b>32.890</b></td>
+                <td>10.441</td>
+                <td><span style="color:#10b981; font-weight:700;">22.365</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">2.302</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Tridayasakti&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Tridayasakti&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>9</b></td>
+                <td><b>Lambangsari</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>2.40</td>
+                <td><b>21.420</b></td>
+                <td>8.925</td>
+                <td><span style="color:#10b981; font-weight:700;">14.566</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">1.499</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Lambangsari&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Lambangsari&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr><tr>
+                <td><b>10</b></td>
+                <td><b>Lambangjaya</b></td>
+                <td><span class="badge-type badge-desa">Desa</span></td>
+                <td>2.10</td>
+                <td><b>14.850</b></td>
+                <td>7.071</td>
+                <td><span style="color:#10b981; font-weight:700;">10.098</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">1.040</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal(&#39;Lambangjaya&#39;)">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage(&#39;Lambangjaya&#39;)">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            </tr></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- ================= VILLAGE DETAIL MODAL ================= -->
+<div class="modal-overlay" id="villageModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div>
+                <h3 id="modalVillageTitle" style="font-size:18px; font-weight:800;">Detail Wilayah</h3>
+                <span id="modalVillageType" class="badge-type badge-desa">Desa</span>
+            </div>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="detail-grid">
+                <div class="detail-box">
+                    <div class="d-lbl">Total Populasi Penduduk</div>
+                    <div class="d-val" id="modalPop">0</div>
+                </div>
+                <div class="detail-box">
+                    <div class="d-lbl">Luas Wilayah (km²)</div>
+                    <div class="d-val" id="modalArea">0 km²</div>
+                </div>
+                <div class="detail-box">
+                    <div class="d-lbl">Kepadatan Penduduk</div>
+                    <div class="d-val" id="modalDensity">0 jiwa/km²</div>
+                </div>
+                <div class="detail-box">
+                    <div class="d-lbl">Estimasi Jumlah KK</div>
+                    <div class="d-val" id="modalKK">0 KK</div>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border-color); padding-top:14px;">
+                <h4 style="font-size:14px; font-weight:700; margin-bottom:10px;"><i class="fa-solid fa-users-line"></i> Rincian Kelompok Usia:</h4>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; text-align:center;">
+                    <div class="detail-box">
+                        <div class="d-lbl">👶 Anak (0-14 th)</div>
+                        <div class="d-val" id="modalAnak">0</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="d-lbl">👨‍💼 Produktif (15-64 th)</div>
+                        <div class="d-val" id="modalProd">0</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="d-lbl">👴 Lansia (65+ th)</div>
+                        <div class="d-val" id="modalLansia">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-box">
+                <div class="d-lbl"><i class="fa-solid fa-user-tie"></i> Kepala Desa / Lurah:</div>
+                <div class="d-val" id="modalLeader" style="font-size:15px;">-</div>
+            </div>
+
+            <div class="pkm-card" style="border-left-color:var(--primary);">
+                <h4><i class="fa-solid fa-lightbulb"></i> Rekomendasi Program PKM Wilayah Ini:</h4>
+                <p id="modalPKMSuggestion">-</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-action btn-primary-action" onclick="zoomToVillageFromModal()">
+                <i class="fa-solid fa-location-crosshairs"></i> Lihat di Peta Interaktif
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= JAVASCRIPT LOGIC ================= -->
+<script>
+    // ============================================================
+    // DATASET LENGKAP 10 DESA / KELURAHAN (2020 - 2025)
+    // ============================================================
+    const datasetPerTahun = {
+        2020: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 62400, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 32900, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 42100, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 49800, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 38500, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 56200, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 70800, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 29500, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 19200, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 13400, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ],
+        2021: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 63800, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 33600, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 43000, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 50900, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 39300, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 57500, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 72400, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 30200, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 19700, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 13700, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ],
+        2022: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 65100, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 34300, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 44000, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 52100, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 40300, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 59000, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 74200, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 31000, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 20200, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 14000, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ],
+        2023: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 66300, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 35000, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 44900, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 53100, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 41100, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 60200, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 75800, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 31700, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 20600, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 14300, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ],
+        2024: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 67400, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 35600, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 45700, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 54000, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 41800, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 61300, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 77100, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 32300, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 21000, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 14600, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ],
+        2025: [
+            { nama: 'Jatimulya', tipe: 'Kelurahan', luas: 3.20, penduduk: 68540, lat: -6.2625, lng: 107.0125, kepala: 'Asep Jacaria, S.AP', pkm: 'Pemberdayaan Lansia & digitalisasi posyandu kelurahan' },
+            { nama: 'Tambun', tipe: 'Desa', luas: 1.85, penduduk: 36250, lat: -6.2570, lng: 107.0600, kepala: 'Juhadi', pkm: 'Penataan area pasar & kebersihan lingkungan perkotaan' },
+            { nama: 'Setiadarma', tipe: 'Desa', luas: 2.95, penduduk: 46480, lat: -6.2650, lng: 107.0420, kepala: 'H. Nunung Subarna', pkm: 'Pemeriksaan kesehatan gratis lansia & stunting anak' },
+            { nama: 'Setiamekar', tipe: 'Desa', luas: 3.40, penduduk: 54820, lat: -6.2510, lng: 107.0320, kepala: 'Suryadi', pkm: 'Pelatihan vokasi & UMKM digital usia produktif' },
+            { nama: 'Mekarsari', tipe: 'Desa', luas: 2.80, penduduk: 42576, lat: -6.2680, lng: 107.0260, kepala: 'Linda Ekawati', pkm: 'Pencegahan stunting balita & posyandu terpadu' },
+            { nama: 'Mangunjaya', tipe: 'Desa', luas: 5.10, penduduk: 62340, lat: -6.2890, lng: 107.0450, kepala: 'Jayadi Said', pkm: 'Pelatihan wirausaha pemuda & kebugaran lansia' },
+            { nama: 'Sumberjaya', tipe: 'Desa', luas: 6.30, penduduk: 78450, lat: -6.2420, lng: 107.0720, kepala: 'Matam', pkm: 'Layanan gizi anak balita & senam seimbang lansia' },
+            { nama: 'Tridayasakti', tipe: 'Desa', luas: 3.15, penduduk: 32890, lat: -6.2610, lng: 107.0810, kepala: 'Suwandi', pkm: 'Penguatan kelembagaan desa & pemuda produktif' },
+            { nama: 'Lambangsari', tipe: 'Desa', luas: 2.40, penduduk: 21420, lat: -6.2820, lng: 107.0650, kepala: 'Pipit Haryanti', pkm: 'Pengembangan kawasan pemukiman hijau & lansia sehat' },
+            { nama: 'Lambangjaya', tipe: 'Desa', luas: 2.10, penduduk: 14850, lat: -6.2950, lng: 107.0710, kepala: 'Kiman Sumantri', pkm: 'Pendataan kependudukan mandiri & kesehatan terpadu' }
+        ]
+    };
+
+    // Public Facilities Map Overlay Markers
+    const facilityLocations = [
+        { type: 'Puskesmas', name: 'Puskesmas Mekarsari', lat: -6.2675, lng: 107.0270 },
+        { type: 'Puskesmas', name: 'Puskesmas Sumberjaya', lat: -6.2435, lng: 107.0710 },
+        { type: 'Rumah Sakit', name: 'RS Sentra Medika Tambun', lat: -6.2645, lng: 107.0435 },
+        { type: 'Rumah Sakit', name: 'RS Karya Medika', lat: -6.2520, lng: 107.0340 },
+        { type: 'Kantor Kecamatan', name: 'Kantor Kecamatan Tambun Selatan', lat: -6.2580, lng: 107.0580 }
+    ];
+
+    // Global App State
+    let selectedYear = 2025;
+    let mapInstance = null;
+    let markersGroup = null;
+    let facilityMarkersGroup = null;
+    let polygonBoundary = null;
+    let activeQuickFilter = 'all';
+
+    // Chart Instances
+    let ageGroupChartInstance = null;
+    let growthTrendChartInstance = null;
+    let popPyramidChartInstance = null;
+    let radarIDMChartInstance = null;
+
+    // ============================================================
+    // DOM READY & INITIALIZATION
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        initCharts();
+        populateComparisonDropdowns();
+        renderDashboardData(2025);
+        runPKMSimulator();
+    });
+
+    function switchTab(tabId, btnElement) {
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+        btnElement.classList.add('active');
+        const targetPane = document.getElementById(tabId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+
+        if (tabId === 'tabMap' && mapInstance) {
+            setTimeout(() => { mapInstance.invalidateSize(); }, 200);
+        }
+    }
+
+    function toggleTheme() {
+        const htmlEl = document.documentElement;
+        const currentTheme = htmlEl.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        htmlEl.setAttribute('data-theme', newTheme);
+
+        const btnText = document.getElementById('themeText');
+        const btnIcon = document.querySelector('#themeToggleBtn i');
+        if (newTheme === 'dark') {
+            btnText.textContent = 'Light Mode';
+            btnIcon.className = 'fa-solid fa-sun';
+        } else {
+            btnText.textContent = 'Dark Mode';
+            btnIcon.className = 'fa-solid fa-moon';
+        }
+    }
+
+    // Animated Count-Up function
+    function animateCounter(elementId, targetValue, isCurrency = false) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const duration = 1000;
+        const frameRate = 30;
+        const totalFrames = duration / (1000 / frameRate);
+        let frame = 0;
+        const startVal = 0;
+
+        const timer = setInterval(() => {
+            frame++;
+            const progress = frame / totalFrames;
+            const currentVal = Math.round(startVal + (targetValue - startVal) * progress);
+            
+            if (isCurrency) {
+                el.textContent = 'Rp ' + currentVal.toLocaleString('id-ID');
+            } else {
+                el.textContent = currentVal.toLocaleString('id-ID');
+            }
+
+            if (frame >= totalFrames) {
+                clearInterval(timer);
+            }
+        }, 1000 / frameRate);
+    }
+
+    // ============================================================
+    // CORE RENDERER
+    // ============================================================
+    function handleYearChange(yearStr) {
+        selectedYear = parseInt(yearStr);
+        document.querySelectorAll('.active-year-label').forEach(el => el.textContent = selectedYear);
+        renderDashboardData(selectedYear);
+    }
+
+    function renderDashboardData(year) {
+        const rawList = datasetPerTahun[year] || datasetPerTahun[2025];
+        
+        let enrichedList = rawList.map(item => {
+            const produktif = Math.round(item.penduduk * 0.68);
+            const lansia = Math.round(item.penduduk * 0.07);
+            const anak = item.penduduk - produktif - lansia;
+            const kepadatan = Math.round(item.penduduk / item.luas);
+            const kk = Math.round(item.penduduk / 4);
+            return { ...item, produktif, lansia, anak, kepadatan, kk };
+        });
+
+        // Apply Quick Filter if active
+        if (activeQuickFilter === 'dense') {
+            enrichedList = enrichedList.filter(d => d.kepadatan > 15000);
+        } else if (activeQuickFilter === 'lansia') {
+            enrichedList = enrichedList.filter(d => d.lansia > 3500);
+        } else if (activeQuickFilter === 'kelurahan') {
+            enrichedList = enrichedList.filter(d => d.tipe === 'Kelurahan');
+        }
+
+        const totalPenduduk = enrichedList.reduce((acc, curr) => acc + curr.penduduk, 0);
+        const totalProduktif = enrichedList.reduce((acc, curr) => acc + curr.produktif, 0);
+        const totalLansia = enrichedList.reduce((acc, curr) => acc + curr.lansia, 0);
+        const totalAnak = enrichedList.reduce((acc, curr) => acc + curr.anak, 0);
+
+        // Counter Animations
+        animateCounter('metricTotalPenduduk', totalPenduduk);
+        animateCounter('metricProduktif', totalProduktif);
+        animateCounter('metricLansia', totalLansia);
+
+        renderRankList(enrichedList);
+        renderTableBody(enrichedList);
+        renderMapMarkers(enrichedList);
+        updateCharts(enrichedList, totalAnak, totalProduktif, totalLansia);
+        runDesaComparison();
+    }
+
+    function applyQuickFilter(filterType, btnEl) {
+        activeQuickFilter = filterType;
+        document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+        renderDashboardData(selectedYear);
+    }
+
+    // ============================================================
+    // RANK & TABLE RENDERERS
+    // ============================================================
+    function renderRankList(list) {
+        const sorted = [...list].sort((a, b) => b.penduduk - a.penduduk);
+        const container = document.getElementById('rankListContainer');
+        container.innerHTML = '';
+
+        sorted.forEach((item, index) => {
+            const rankItem = document.createElement('div');
+            rankItem.className = 'desa-rank-item';
+            rankItem.onclick = () => openVillageModal(item.nama);
+            rankItem.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="rank-num">${index + 1}</div>
+                    <div>
+                        <div class="rank-name">${item.nama}</div>
+                        <div class="rank-sub">${item.tipe} • ${item.luas} km²</div>
+                    </div>
+                </div>
+                <div class="rank-stat">
+                    <div class="rank-val">${item.penduduk.toLocaleString('id-ID')}</div>
+                    <div class="rank-sub">${item.kepadatan.toLocaleString('id-ID')} jiwa/km²</div>
+                </div>
+            `;
+            container.appendChild(rankItem);
+        });
+    }
+
+    function renderTableBody(list) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        list.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${idx + 1}</b></td>
+                <td><b>${item.nama}</b></td>
+                <td><span class="badge-type ${item.tipe === 'Kelurahan' ? 'badge-kelurahan' : 'badge-desa'}">${item.tipe}</span></td>
+                <td>${item.luas.toFixed(2)}</td>
+                <td><b>${item.penduduk.toLocaleString('id-ID')}</b></td>
+                <td>${item.kepadatan.toLocaleString('id-ID')}</td>
+                <td><span style="color:#10b981; font-weight:700;">${item.produktif.toLocaleString('id-ID')}</span></td>
+                <td><span style="color:#f59e0b; font-weight:700;">${item.lansia.toLocaleString('id-ID')}</span></td>
+                <td>
+                    <button class="btn-table-action" onclick="openVillageModal('${item.nama}')">
+                        <i class="fa-solid fa-circle-info"></i> Detail
+                    </button>
+                    <button class="btn-table-action" onclick="zoomToVillage('${item.nama}')">
+                        <i class="fa-solid fa-location-dot"></i> Peta
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterGlobalSearch(query) {
+        const term = query.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+
+        const rankItems = document.querySelectorAll('.desa-rank-item');
+        rankItems.forEach(item => {
+            item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+    }
+
+    let sortAsc = false;
+    function sortTable(colIndex) {
+        const list = datasetPerTahun[selectedYear];
+        const enriched = list.map(item => ({
+            ...item,
+            produktif: Math.round(item.penduduk * 0.68),
+            lansia: Math.round(item.penduduk * 0.07),
+            kepadatan: Math.round(item.penduduk / item.luas)
+        }));
+
+        sortAsc = !sortAsc;
+        enriched.sort((a, b) => {
+            let valA, valB;
+            switch(colIndex) {
+                case 1: valA = a.nama; valB = b.nama; break;
+                case 2: valA = a.tipe; valB = b.tipe; break;
+                case 3: valA = a.luas; valB = b.luas; break;
+                case 4: valA = a.penduduk; valB = b.penduduk; break;
+                case 5: valA = a.kepadatan; valB = b.kepadatan; break;
+                case 6: valA = a.produktif; valB = b.produktif; break;
+                case 7: valA = a.lansia; valB = b.lansia; break;
+                default: valA = a.nama; valB = b.nama;
+            }
+            if (typeof valA === 'string') return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            return sortAsc ? valA - valB : valB - valA;
+        });
+
+        renderTableBody(enriched);
+    }
+
+    // ============================================================
+    // MAP & GIS LAYERS LOGIC
+    // ============================================================
+    function initMap() {
+        mapInstance = L.map('map').setView([-6.2680, 107.0450], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors | Kantor Kecamatan Tambun Selatan'
+        }).addTo(mapInstance);
+
+        markersGroup = L.layerGroup().addTo(mapInstance);
+        facilityMarkersGroup = L.layerGroup().addTo(mapInstance);
+
+        polygonBoundary = L.polygon([
+            [-6.2350, 107.0100],
+            [-6.2380, 107.0850],
+            [-6.3050, 107.0900],
+            [-6.3100, 107.0150]
+        ], {
+            color: '#2563eb',
+            weight: 2.5,
+            dashArray: '6, 6',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.06
+        }).addTo(mapInstance).bindPopup('<b>Batas Wilayah Kecamatan Tambun Selatan</b>');
+
+        renderFacilityMarkers();
+    }
+
+    function renderFacilityMarkers() {
+        if (!facilityMarkersGroup) return;
+        facilityMarkersGroup.clearLayers();
+
+        facilityLocations.forEach(fac => {
+            const facMarker = L.circleMarker([fac.lat, fac.lng], {
+                radius: 7,
+                color: '#8b5cf6',
+                fillColor: '#c4b5fd',
+                fillOpacity: 0.9,
+                weight: 2
+            }).bindPopup(`<b>${fac.type}</b><br>${fac.name}`);
+            facilityMarkersGroup.addLayer(facMarker);
+        });
+    }
+
+    function toggleFacilityMarkers() {
+        const chk = document.getElementById('layerFacilityChk').checked;
+        if (chk) {
+            mapInstance.addLayer(facilityMarkersGroup);
+        } else {
+            mapInstance.removeLayer(facilityMarkersGroup);
+        }
+    }
+
+    function toggleBoundaryPolygon() {
+        const chk = document.getElementById('layerBoundaryChk').checked;
+        if (chk) {
+            mapInstance.addLayer(polygonBoundary);
+        } else {
+            mapInstance.removeLayer(polygonBoundary);
+        }
+    }
+
+    function renderMapMarkers(list) {
+        if (!mapInstance || !markersGroup) return;
+        markersGroup.clearLayers();
+
+        list.forEach(item => {
+            const radius = 8 + (item.penduduk / 3800);
+            const color = '#2563eb';
+
+            const circle = L.circleMarker([item.lat, item.lng], {
+                radius: Math.min(radius, 28),
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.6,
+                weight: 2
+            });
+
+            const popupContent = `
+                <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:13px; line-height:1.4;">
+                    <b style="font-size:14px; color:#0f172a;">${item.tipe} ${item.nama}</b><br>
+                    👥 <b>${item.penduduk.toLocaleString('id-ID')}</b> Jiwa<br>
+                    📐 Luas: ${item.luas} km²<br>
+                    📊 Kepadatan: <b>${item.kepadatan.toLocaleString('id-ID')}</b> jiwa/km²<br>
+                    👨‍💼 Usia Produktif: ${item.produktif.toLocaleString('id-ID')}<br>
+                    👴 Lansia: ${item.lansia.toLocaleString('id-ID')}<br>
+                    <hr style="margin:6px 0; border:none; border-top:1px solid #ddd;">
+                    <button onclick="openVillageModal('${item.nama}')" style="background:#2563eb; color:#fff; border:none; padding:5px 10px; border-radius:4px; font-size:11px; cursor:pointer; width:100%;">Detail & Rekomendasi PKM</button>
+                </div>
+            `;
+
+            circle.bindPopup(popupContent);
+            circle.addTo(markersGroup);
+        });
+    }
+
+    function zoomToVillage(namaDesa) {
+        const list = datasetPerTahun[selectedYear];
+        const target = list.find(d => d.nama === namaDesa);
+        if (target && mapInstance) {
+            switchTab('tabMap', document.querySelector('.nav-btn'));
+            mapInstance.flyTo([target.lat, target.lng], 15, { duration: 1.2 });
+        }
+    }
+
+    // ============================================================
+    // SIMULATOR PKM LOGIC
+    // ============================================================
+    function runPKMSimulator() {
+        const lansiaVal = parseInt(document.getElementById('simTargetLansia').value) || 0;
+        const stuntingVal = parseInt(document.getElementById('simTargetStunting').value) || 0;
+        const vokasiVal = parseInt(document.getElementById('simTargetVokasi').value) || 0;
+
+        // Formula Calculation
+        const costLansia = lansiaVal * 15000;
+        const costStunting = stuntingVal * 25000;
+        const costVokasi = vokasiVal * 30000;
+        const totalEstCost = costLansia + costStunting + costVokasi;
+
+        const kaderNeeded = Math.ceil((lansiaVal + stuntingVal) / 45);
+        const pmtPackages = stuntingVal;
+        const sesiLansia = Math.ceil(lansiaVal / 50);
+        const batchUMKM = Math.ceil(vokasiVal / 50);
+
+        animateCounter('simEstCost', totalEstCost, true);
+        document.getElementById('simKaderVal').textContent = `${kaderNeeded} Orang`;
+        document.getElementById('simPMTVal').textContent = `${pmtPackages.toLocaleString('id-ID')} Paket`;
+        document.getElementById('simSesiLansia').textContent = `${sesiLansia} Sesi`;
+        document.getElementById('simBatchUMKM').textContent = `${batchUMKM} Batch`;
+    }
+
+    function triggerSimComplete() {
+        runPKMSimulator();
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+    }
+
+    function triggerConfettiReport() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.4 } });
+        }
+        setTimeout(() => window.print(), 300);
+    }
+
+    // ============================================================
+    // COMPARISON MODULE LOGIC
+    // ============================================================
+    function populateComparisonDropdowns() {
+        const list = datasetPerTahun[2025];
+        const selA = document.getElementById('compDesaA');
+        const selB = document.getElementById('compDesaB');
+
+        selA.innerHTML = '';
+        selB.innerHTML = '';
+
+        list.forEach((item, idx) => {
+            selA.appendChild(new Option(`${item.tipe} ${item.nama}`, item.nama, idx === 0, idx === 0));
+            selB.appendChild(new Option(`${item.tipe} ${item.nama}`, item.nama, idx === 6, idx === 6));
+        });
+    }
+
+    function runDesaComparison() {
+        const nameA = document.getElementById('compDesaA').value;
+        const nameB = document.getElementById('compDesaB').value;
+
+        const list = datasetPerTahun[selectedYear];
+        const itemA = list.find(d => d.nama === nameA) || list[0];
+        const itemB = list.find(d => d.nama === nameB) || list[1];
+
+        const renderCol = (item) => {
+            const produktif = Math.round(item.penduduk * 0.68);
+            const lansia = Math.round(item.penduduk * 0.07);
+            const kepadatan = Math.round(item.penduduk / item.luas);
+            return `
+                <div class="comp-header">${item.tipe} ${item.nama}</div>
+                <div class="detail-box"><div class="d-lbl">Total Penduduk</div><div class="d-val">${item.penduduk.toLocaleString('id-ID')} jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Luas Wilayah</div><div class="d-val">${item.luas} km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Kepadatan</div><div class="d-val">${kepadatan.toLocaleString('id-ID')} jiwa/km²</div></div>
+                <div class="detail-box"><div class="d-lbl">Usia Produktif</div><div class="d-val" style="color:var(--accent-green);">${produktif.toLocaleString('id-ID')} jiwa</div></div>
+                <div class="detail-box"><div class="d-lbl">Lansia (65+)</div><div class="d-val" style="color:var(--accent-amber);">${lansia.toLocaleString('id-ID')} jiwa</div></div>
+                <div class="pkm-card"><h4 style="font-size:12.5px;"><i class="fa-solid fa-lightbulb"></i> Fokus PKM:</h4><p style="font-size:12px;">${item.pkm}</p></div>
+            `;
+        };
+
+        document.getElementById('compColA').innerHTML = renderCol(itemA);
+        document.getElementById('compColB').innerHTML = renderCol(itemB);
+    }
+
+    // ============================================================
+    // MODAL DIALOG LOGIC
+    // ============================================================
+    function openVillageModal(namaDesa) {
+        const list = datasetPerTahun[selectedYear];
+        const item = list.find(d => d.nama === namaDesa);
+        if (!item) return;
+
+        const produktif = Math.round(item.penduduk * 0.68);
+        const lansia = Math.round(item.penduduk * 0.07);
+        const anak = item.penduduk - produktif - lansia;
+        const kepadatan = Math.round(item.penduduk / item.luas);
+        const kk = Math.round(item.penduduk / 4);
+
+        document.getElementById('modalVillageTitle').textContent = `${item.tipe} ${item.nama}`;
+        document.getElementById('modalVillageType').textContent = item.tipe;
+        document.getElementById('modalPop').textContent = `${item.penduduk.toLocaleString('id-ID')} Jiwa`;
+        document.getElementById('modalArea').textContent = `${item.luas.toFixed(2)} km²`;
+        document.getElementById('modalDensity').textContent = `${kepadatan.toLocaleString('id-ID')} jiwa/km²`;
+        document.getElementById('modalKK').textContent = `${kk.toLocaleString('id-ID')} KK`;
+
+        document.getElementById('modalAnak').textContent = anak.toLocaleString('id-ID');
+        document.getElementById('modalProd').textContent = produktif.toLocaleString('id-ID');
+        document.getElementById('modalLansia').textContent = lansia.toLocaleString('id-ID');
+        document.getElementById('modalLeader').textContent = item.kepala;
+        document.getElementById('modalPKMSuggestion').textContent = item.pkm;
+
+        document.getElementById('villageModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('villageModal').classList.remove('active');
+    }
+
+    function zoomToVillageFromModal() {
+        const title = document.getElementById('modalVillageTitle').textContent;
+        const cleanName = title.replace('Kelurahan ', '').replace('Desa ', '');
+        closeModal();
+        zoomToVillage(cleanName);
+    }
+
+    // ============================================================
+    // CHART.JS INITIALIZATION & UPDATES
+    // ============================================================
+    function initCharts() {
+        // 1. Doughnut Age Group
+        const ctx1 = document.getElementById('ageGroupChart').getContext('2d');
+        ageGroupChartInstance = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Anak (0-14 th)', 'Produktif (15-64 th)', 'Lansia (65+ th)'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                cutout: '68%'
+            }
+        });
+
+        // 2. Population Pyramid (Stacked Horizontal Bar)
+        const ctxPyramid = document.getElementById('popPyramidChart').getContext('2d');
+        popPyramidChartInstance = new Chart(ctxPyramid, {
+            type: 'bar',
+            data: {
+                labels: ['0-14 th', '15-29 th', '30-44 th', '45-59 th', '60-69 th', '70+ th'],
+                datasets: [
+                    { label: 'Laki-Laki', data: [-58000, -82000, -74000, -45000, -12000, -4500], backgroundColor: '#3b82f6' },
+                    { label: 'Perempuan', data: [56600, 79500, 72100, 43800, 11800, 4300], backgroundColor: '#ec4899' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.dataset.label}: ${Math.abs(ctx.raw).toLocaleString('id-ID')} jiwa`
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { callback: (v) => Math.abs(v / 1000) + 'k' } }
+                }
+            }
+        });
+
+        // 3. Radar IDM Chart
+        const ctxRadar = document.getElementById('radarIDMChart').getContext('2d');
+        radarIDMChartInstance = new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Akses Kesehatan', 'Pendidikan', 'Infrastruktur', 'Ekonomi UMKM', 'Layanan Desa', 'Kesejahteraan Lansia'],
+                datasets: [
+                    { label: 'Rata-Rata Kecamatan', data: [88, 82, 85, 90, 86, 80], backgroundColor: 'rgba(37, 99, 235, 0.2)', borderColor: '#2563eb' },
+                    { label: 'Target Standar PKM', data: [95, 90, 90, 95, 95, 90], backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { r: { min: 50, max: 100 } }
+            }
+        });
+
+        // 4. Line Growth Chart
+        const ctxGrowth = document.getElementById('growthTrendChart').getContext('2d');
+        growthTrendChartInstance = new Chart(ctxGrowth, {
+            type: 'line',
+            data: {
+                labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+                datasets: [{
+                    label: 'Total Penduduk',
+                    data: [415600, 424200, 433100, 442400, 450700, 458566],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function updateCharts(list, anakSum, prodSum, lansiaSum) {
+        if (ageGroupChartInstance) {
+            ageGroupChartInstance.data.datasets[0].data = [anakSum, prodSum, lansiaSum];
+            ageGroupChartInstance.update();
+
+            document.getElementById('valAnakStat').textContent = anakSum.toLocaleString('id-ID');
+            document.getElementById('valProdStat').textContent = prodSum.toLocaleString('id-ID');
+            document.getElementById('valLansiaStat').textContent = lansiaSum.toLocaleString('id-ID');
+        }
+    }
+
+    // ============================================================
+    // EXPORT TO CSV
+    // ============================================================
+    function exportDataCSV() {
+        const rawList = datasetPerTahun[selectedYear];
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "No,Nama Wilayah,Tipe,Luas (km2),Total Penduduk,Kepadatan (jiwa/km2),Usia Produktif (15-64),Lansia (65+),Jumlah KK,Kepala Wilayah\n";
+
+        rawList.forEach((item, idx) => {
+            const produktif = Math.round(item.penduduk * 0.68);
+            const lansia = Math.round(item.penduduk * 0.07);
+            const kepadatan = Math.round(item.penduduk / item.luas);
+            const kk = Math.round(item.penduduk / 4);
+
+            csvContent += `${idx+1},"${item.nama}","${item.tipe}",${item.luas},${item.penduduk},${kepadatan},${produktif},${lansia},${kk},"${item.kepala}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Data_Kependudukan_Tambun_Selatan_${selectedYear}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+<script async="" src="./Dashboard_2_files/hud" data-nf-variant="public" data-netlify-site-id="3da4461b-7918-45d3-8c37-31eb089394f0" data-app-host="app.netlify.com"></script>
+<iframe id="nl-badge-frame" title="Powered by Netlify" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: transparent; z-index: 2147483645; width: 197px; height: 64px; clip-path: path(&quot;M 3 3 H 184 V 51 H 3 Z&quot;);" data-nl-ready="1" src="./Dashboard_2_files/saved_resource.html"></iframe></body></html>
