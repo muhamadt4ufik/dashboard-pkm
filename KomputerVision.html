@@ -728,6 +728,7 @@
             <ul class="nav-links">
                 <li><a href="#video">Video</a></li>
                 <li><a href="#pendahuluan">Pendahuluan</a></li>
+                <li><a href="#konsep-dasar">Konsep Dasar</a></li>
                 <li><a href="#spesifikasi">Spesifikasi</a></li>
                 <li><a href="#tahapan">Tahapan</a></li>
                 <li><a href="#arsitektur">Arsitektur</a></li>
@@ -832,10 +833,46 @@
                 <h3><i class="fas fa-book-open" style="color: var(--primary);"></i> 1.1 Latar Belakang</h3>
                 <p>Perkembangan teknologi Computer Vision (Visi Komputer) dalam beberapa tahun terakhir telah melahirkan berbagai arsitektur jaringan saraf tiruan (deep learning) yang mampu mendeteksi dan mengklasifikasikan objek secara instan. Salah satu model state-of-the-art paling populer dan efisien di industri saat ini adalah YOLO (You Only Look Once), khususnya varian YOLOv8 yang dikembangkan oleh Ultralytics. YOLOv8 terkenal karena kecepatannya yang sangat tinggi tanpa mengorbankan akurasi mean Average Precision (mAP).</p>
                 <p>Meskipun deteksi visual pada layar komputer sangat informatif, pada implementasi dunia nyata—seperti sistem pemantauan ruang kerja, alat bantu tuna netra (assistive technology), maupun asisten pintar—pengguna sering kali tidak dapat memantau monitor secara terus-menerus. Oleh karena itu, diperlukan integrasi modalitas feedback lain yang bersifat auditif (suara). Dengan menggabungkan deteksi visual kamera dan Text-to-Speech (TTS) offline berbahasa Indonesia, sistem dapat langsung mengumumkan nama benda yang tertangkap di depan kamera tanpa mengharuskan pengguna memandang layar.</p>
+                <p>Aplikasi ini nanti bisa dikembangkan lebih jauh, salah satunya alat bantu tuna netra. Alat/sistem mendeteksi benda-benda yang ada di depan kamera, dan menyebutkan benda tersebut dalam bentuk suara. Sistem ini menggabungkan deteksi visual kamera dan Text-to-Speech (TTS) offline berbahasa Indonesia, dan dapat dijalankan (running) dalam kondisi tanpa internet.</p>
+            </div>
+
+            <div class="card" id="konsep-dasar">
+                <h3><i class="fas fa-lightbulb" style="color: var(--warning);"></i> 1.2 Konsep Dasar di Balik Sistem Ini (Penjelasan Sederhana Computer Vision)</h3>
+                <p>Agar mudah dipahami dan dijelaskan saat presentasi, sistem pada skrip <code>yolo_suara.py</code> ini sebenarnya bekerja dengan cara meniru mata dan otak manusia saat mengenali benda di sekitarnya. Ada empat konsep dasar utama yang membuat komputer bisa mengenali benda secara cepat dan akurat:</p>
+                
+                <h4 style="color: var(--primary);"><i class="fas fa-eye"></i> A. Bagaimana Komputer "Melihat" dan Mengenali Benda?</h4>
+                <p>Bagi manusia, melihat benda di atas meja adalah hal yang sangat alami. Namun bagi kamera komputer, gambar awalnya hanyalah ribuan titik warna (piksel) tanpa nama. Supaya komputer bisa paham apa yang ada di depannya, ada 3 tahapan yang terjadi dalam sekejap mata:</p>
+                <ul class="styled-list">
+                    <li><strong>1. Menangkap Gambar:</strong> Webcam merekam meja kerja kita setiap detik secara terus-menerus.</li>
+                    <li><strong>2. Mencari Ciri Khas Benda:</strong> Komputer mulai memindai garis batas tepi, sudut, dan bentuk benda (misalnya: pola persegi panjang berlayar hitam untuk Handphone, atau bentuk lingkaran untuk Jam).</li>
+                    <li><strong>3. Menebak dan Bersuara:</strong> Setelah bentuknya cocok dengan pengetahuannya, komputer langsung yakin: <em>"Oh, ini Handphone!"</em>. Komputer lalu menggambar kotak hijau di layar dan langsung memerintahkan speaker untuk bersuara.</li>
+                </ul>
+                <div class="alert alert-info" style="margin-top: 1rem;">
+                    <div class="alert-icon">💡</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Ketangguhan Menghadapi Kondisi Nyata</div>
+                        <div class="alert-text">Tantangan di dunia nyata cukup beragam: kadang lampu ruangan agak redup, benda ditaruh miring, jaraknya terlalu jauh, atau meja sedang berantakan. Sistem AI yang digunakan di proyek ini sudah dirancang pintar agar tetap bisa mengenali benda dengan tepat meski kondisinya tidak sempurna.</div>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--accent);"><i class="fas fa-search-plus"></i> B. Bagaimana Komputer Membaca Gambar? (Warna dan Konsep "Kaca Pembesar")</h4>
+                <p>Bagi kita, gambar adalah foto. Tetapi bagi komputer, gambar dibaca sebagai susunan angka-angka warna: <strong>Biru, Hijau, dan Merah</strong> (di dalam sistem disebut format BGR oleh OpenCV).</p>
+                <p>Untuk menemukan benda di antara jutaan angka warna tersebut, komputer memakai teknik bernama <strong>Konvolusi</strong>. Bayangkan komputer memegang sebuah <em>"kaca pembesar kecil"</em>, lalu menggesernya sedikit demi sedikit ke seluruh permukaan layar untuk mencari bagian penting—seperti garis batas benda, lekukan sudut, dan warna khas. Dari potongan-potongan kecil yang ditemukan kaca pembesar inilah, komputer bisa merangkai dan menyimpulkan bentuk utuh sebuah benda.</p>
+
+                <h4 style="color: var(--secondary);"><i class="fas fa-bolt"></i> C. Kenapa Memilih AI YOLOv8? (Perbedaan Cara Lama vs Cara Modern)</h4>
+                <p><em>Mungkin muncul pertanyaan: mengapa kita memilih teknologi YOLOv8 dan bukan cara deteksi lainnya?</em></p>
+                <ul class="styled-list">
+                    <li><strong>Cara Lama (Zaman Dulu):</strong> Dahulu, para ahli harus membuat rumus matematika manual yang rumit untuk setiap bentuk benda. Caranya sangat lambat karena komputer harus memotong gambar menjadi kotak-kotak kecil, memeriksanya berkali-kali, baru menebaknya satu per satu. Jika posisi benda miring atau diputar sedikit saja, cara lama ini sering gagal mengenali.</li>
+                    <li><strong>Cara Modern (YOLOv8):</strong> YOLO adalah singkatan dari <em>"You Only Look Once"</em> (Kamu Cuma Perlu Melihat Sekali). Ini adalah teknologi kecerdasan buatan (AI) modern yang sudah dilatih melihat jutaan benda sebelumnya. Dalam satu kedipan mata, YOLO langsung melihat seluruh layar sekaligus, menemukan posisi benda di meja, dan menebak namanya saat itu juga. Karena hanya "melihat sekali", prosesnya luar biasa cepat dan ringan, sehingga video kamera berjalan sangat mulus (real-time) tanpa patah-patah.</li>
+                </ul>
+
+                <h4 style="color: var(--success);"><i class="fas fa-volume-up"></i> D. Menghubungkan Penglihatan AI dengan Suara (Manfaat Nyata untuk Tunanetra)</h4>
+                <p>Melihat kotak deteksi di layar monitor tentu tidak akan membantu jika pengguna memiliki keterbatasan penglihatan. Oleh karena itu, kita menggabungkan <strong>"mata digital"</strong> (kamera dan AI YOLOv8) dengan <strong>"mulut digital"</strong> (suara offline Windows SAPI5). Begitu kamera melihat ada handphone di meja, speaker langsung menyebutkan kata <em>"Handphone"</em> dalam Bahasa Indonesia yang santai dan jelas.</p>
+                <p>Kombinasi inilah yang membuat proyek ini sangat cocok dikembangkan lebih lanjut menjadi alat bantu mandiri bagi teman-teman tunanetra agar bisa mengetahui benda apa saja yang ada di hadapannya cukup dengan mendengarkan suara tanpa perlu melihat layar monitor.</p>
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-bullseye" style="color: var(--secondary);"></i> 1.2 Tujuan Proyek</h3>
+                <h3><i class="fas fa-bullseye" style="color: var(--secondary);"></i> 1.3 Tujuan Proyek</h3>
                 <p>Tujuan utama dari perancangan dan pembuatan skrip yolo_suara.py adalah:</p>
                 <ul class="styled-list">
                     <li>Membangun sistem deteksi objek real-time menggunakan webcam laptop/komputer dengan model YOLOv8 Nano</li>
@@ -847,7 +884,7 @@
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-th-large" style="color: var(--accent);"></i> 1.3 Ruang Lingkup Sistem</h3>
+                <h3><i class="fas fa-th-large" style="color: var(--accent);"></i> 1.4 Ruang Lingkup Sistem</h3>
                 <p>Sistem ini difokuskan pada pengenalan objek-objek yang lazim ditemukan di atas meja kerja berdasarkan bobot pretrained model COCO (Common Objects in Context). Tabel berikut merinci daftar kelas objek yang dikonfigurasi dalam sistem:</p>
                 
                 <div class="table-container">
@@ -1414,7 +1451,8 @@ Membuka kamera webcam...
                     <li><strong>Fine-Tuning Custom Dataset:</strong> Melakukan pelatihan model tambahan (custom training) untuk mengenali benda-benda meja yang lebih spesifik, seperti dompet, kartu identitas, kunci kendaraan, atau jenis obat tertentu</li>
                     <li><strong>Estimasi Jarak & Posisi Objek:</strong> Menambahkan logika estimasi posisi koordinat relatif benda (kiri, tengah, kanan) pada layar kamera untuk diumumkan bersama nama benda (contoh: 'Handphone di sebelah kiri')</li>
                     <li><strong>Deployment ke Perangkat Edge:</strong> Memigrasikan arsitektur ini ke perangkat mini PC seperti Raspberry Pi atau NVIDIA Jetson Nano untuk dijadikan perangkat portabel (kacamata pintar atau kalung pintar tuna netra)</li>
-                    <li>Proyek ini memiliki potensi besar untuk dikembangkan menjadi aplikasi pintar, seperti kursi roda pintar atau alat bantu portabel lainnya, yang dirancang khusus untuk memandu penyandang tunanetra dalam berjalan di lingkungan sekitar secara mandiri dan aman</li>
+                    <li><strong>Aplikasi Asistif Tunanetra Lanjutan:</strong> Proyek ini memiliki potensi besar untuk dikembangkan menjadi aplikasi pintar, seperti kursi roda pintar atau alat bantu portabel lainnya, yang dirancang khusus untuk memandu penyandang tunanetra dalam berjalan di lingkungan sekitar secara mandiri dan aman</li>
+                    <li><strong>Fitur Pengingat Benda Pintar (Object Tracking):</strong> Ke depannya, sistem dapat ditambahkan kemampuan "mengingat benda". Jadi, apabila handphone di atas meja hanya bergeser sedikit, komputer cukup menyebutkannya satu kali saja dan tidak berulang-ulang berteriak "Handphone! Handphone!" tanpa henti selama bendanya masih sama</li>
                 </ul>
             </div>
         </section>
