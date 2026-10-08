@@ -10,6 +10,173 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+/* ===== LOGIN OVERLAY ===== */
+#login-overlay {
+  position:fixed; inset:0; z-index:99999;
+  background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins',sans-serif;
+}
+#login-overlay::before {
+  content:''; position:absolute; width:600px; height:600px;
+  background:radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 70%);
+  top:-100px; left:-100px; border-radius:50%;
+  animation:loginPulse 6s ease-in-out infinite;
+}
+#login-overlay::after {
+  content:''; position:absolute; width:500px; height:500px;
+  background:radial-gradient(circle,rgba(236,72,153,0.12) 0%,transparent 70%);
+  bottom:-100px; right:-100px; border-radius:50%;
+  animation:loginPulse 8s ease-in-out infinite reverse;
+}
+@keyframes loginPulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.2);opacity:0.6;} }
+
+.login-box {
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(30px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;
+  padding:50px 45px;
+  width:100%; max-width:420px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  z-index:1; position:relative;
+  animation:loginSlideIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes loginSlideIn { from{opacity:0;transform:translateY(40px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
+
+.login-logo {
+  text-align:center; margin-bottom:30px;
+}
+.login-logo .login-icon {
+  width:70px; height:70px; border-radius:20px; margin:0 auto 15px;
+  background:linear-gradient(135deg,#6366f1,#ec4899);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem; color:#fff;
+  box-shadow:0 10px 30px rgba(99,102,241,0.4);
+}
+.login-logo h2 { color:#fff; font-size:1.5rem; font-weight:700; }
+.login-logo p { color:rgba(255,255,255,0.5); font-size:0.85rem; margin-top:4px; }
+
+.login-group {
+  margin-bottom:20px; position:relative;
+}
+.login-group label {
+  display:block; color:rgba(255,255,255,0.7); font-size:0.82rem;
+  font-weight:500; margin-bottom:8px; letter-spacing:0.5px; text-transform:uppercase;
+}
+.login-group .input-wrap {
+  position:relative;
+}
+.login-group .input-wrap i {
+  position:absolute; left:16px; top:50%; transform:translateY(-50%);
+  color:rgba(255,255,255,0.35); font-size:0.95rem; pointer-events:none;
+}
+.login-group input {
+  width:100%; background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px; padding:14px 16px 14px 44px;
+  color:#fff; font-size:0.95rem; font-family:'Poppins',sans-serif;
+  outline:none; transition:all 0.3s;
+}
+.login-group input::placeholder { color:rgba(255,255,255,0.25); }
+.login-group input:focus {
+  border-color:rgba(99,102,241,0.7);
+  background:rgba(99,102,241,0.1);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.2);
+}
+
+.login-toggle-pw {
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.95rem;
+  background:none; border:none; padding:4px; pointer-events:all;
+}
+.login-toggle-pw:hover { color:rgba(255,255,255,0.7); }
+
+.login-error {
+  background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3);
+  border-radius:10px; padding:10px 14px; margin-bottom:18px;
+  color:#fca5a5; font-size:0.85rem; display:none; align-items:center; gap:8px;
+}
+.login-error.show { display:flex; animation:shake 0.4s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
+
+#login-btn {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899);
+  background-size:200% 200%; animation:gradientShift 3s ease infinite;
+  border:none; border-radius:12px; color:#fff;
+  font-size:1rem; font-weight:600; font-family:'Poppins',sans-serif;
+  cursor:pointer; transition:all 0.3s; margin-top:8px;
+  box-shadow:0 8px 25px rgba(99,102,241,0.4);
+}
+@keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+#login-btn:hover { transform:translateY(-2px); box-shadow:0 12px 35px rgba(99,102,241,0.5); }
+#login-btn:active { transform:translateY(0); }
+#login-btn.loading { opacity:0.7; pointer-events:none; }
+
+.login-footer { text-align:center; margin-top:25px; color:rgba(255,255,255,0.3); font-size:0.78rem; }
+
+#main-content { display:none; }
+
+/* ===== LOGOUT BUTTON ===== */
+#logout-btn {
+  display:flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.25));
+  border:1px solid rgba(239,68,68,0.35);
+  color:#ef4444; border-radius:8px;
+  padding:7px 14px; font-size:0.82rem; font-weight:600;
+  cursor:pointer; font-family:'Poppins',sans-serif;
+  transition:all 0.3s; white-space:nowrap;
+}
+#logout-btn:hover {
+  background:linear-gradient(135deg,rgba(239,68,68,0.8),rgba(220,38,38,0.9));
+  color:#fff; border-color:transparent;
+  transform:translateY(-1px); box-shadow:0 4px 15px rgba(239,68,68,0.35);
+}
+
+/* ===== AUTO-LOGOUT WARNING MODAL ===== */
+#autologout-warning {
+  position:fixed; inset:0; z-index:99998;
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+}
+#autologout-warning.show { display:flex; }
+.alw-box {
+  background:#1e293b; border:1px solid rgba(239,68,68,0.4);
+  border-radius:20px; padding:40px 35px; text-align:center;
+  max-width:380px; width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  animation:loginSlideIn 0.4s ease;
+}
+.alw-icon {
+  width:60px; height:60px; border-radius:50%; margin:0 auto 18px;
+  background:rgba(239,68,68,0.15); border:2px solid rgba(239,68,68,0.4);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem; color:#f87171;
+  animation:loginPulse 1.5s ease-in-out infinite;
+}
+.alw-box h3 { color:#fff; font-size:1.2rem; font-weight:700; margin-bottom:8px; }
+.alw-box p { color:rgba(255,255,255,0.55); font-size:0.88rem; margin-bottom:6px; }
+#alw-countdown {
+  font-size:2.5rem; font-weight:800; color:#f87171;
+  margin:14px 0; font-variant-numeric:tabular-nums;
+}
+.alw-actions { display:flex; gap:10px; justify-content:center; margin-top:20px; }
+.alw-btn-stay {
+  padding:11px 24px; border-radius:10px; border:none; cursor:pointer;
+  font-family:'Poppins',sans-serif; font-weight:600; font-size:0.9rem;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff;
+  transition:all 0.3s;
+}
+.alw-btn-stay:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(99,102,241,0.4); }
+.alw-btn-logout {
+  padding:11px 24px; border-radius:10px; cursor:pointer;
+  font-family:'Poppins',sans-serif; font-weight:600; font-size:0.9rem;
+  background:transparent; border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.5); transition:all 0.3s;
+}
+.alw-btn-logout:hover { color:#fff; border-color:rgba(255,255,255,0.4); }
+
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
 :root {
   --primary:#6366f1;
@@ -855,6 +1022,43 @@ footer {
 </head>
 <body>
 
+<!-- ===== LOGIN OVERLAY ===== -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-icon"><i class="fas fa-graduation-cap"></i></div>
+      <h2>PKM Portal</h2>
+      <p>Silakan login untuk melanjutkan</p>
+    </div>
+    <div class="login-error" id="login-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>Username atau password salah.</span>
+    </div>
+    <div class="login-group">
+      <label>Username</label>
+      <div class="input-wrap">
+        <i class="fas fa-user"></i>
+        <input type="text" id="login-username" placeholder="Masukkan username" autocomplete="username" />
+      </div>
+    </div>
+    <div class="login-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="login-password" placeholder="Masukkan password" autocomplete="current-password" />
+        <button class="login-toggle-pw" id="toggle-pw" type="button" tabindex="-1">
+          <i class="fas fa-eye" id="pw-eye-icon"></i>
+        </button>
+      </div>
+    </div>
+    <button id="login-btn"><i class="fas fa-sign-in-alt"></i>&nbsp; Masuk</button>
+    <div class="login-footer">Pengabdian Kepada Masyarakat &mdash; Universitas Pamulang</div>
+  </div>
+</div>
+
+<!-- ===== KONTEN UTAMA (tersembunyi sampai login) ===== -->
+<div id="main-content">
+
 <!-- NAVBAR -->
 <nav>
   <div class="logo"><i class="fas fa-hands-helping"></i>PKM</div>
@@ -869,8 +1073,30 @@ footer {
     <li><a href="#sertifikat">Sertifikat</a></li>
     <li><a href="#galeri">Galeri Foto</a></li>
   </ul>
+  <button id="logout-btn" onclick="pkmLogout()" style="display:none;">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
   <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
+
+<!-- AUTO-LOGOUT WARNING MODAL -->
+<div id="autologout-warning">
+  <div class="alw-box">
+    <div class="alw-icon"><i class="fas fa-clock"></i></div>
+    <h3>Sesi Akan Berakhir</h3>
+    <p>Tidak ada aktivitas terdeteksi.<br>Anda akan otomatis logout dalam:</p>
+    <div id="alw-countdown">30</div>
+    <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);">detik</p>
+    <div class="alw-actions">
+      <button class="alw-btn-stay" onclick="pkmStayLoggedIn()">
+        <i class="fas fa-check"></i> Tetap Login
+      </button>
+      <button class="alw-btn-logout" onclick="pkmLogout()">
+        Logout Sekarang
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero" id="home">
@@ -1066,7 +1292,7 @@ footer {
         <label><i class="fas fa-calendar-day"></i> Pilih Sesi Kegiatan</label>
         <select name="sesi" required>
           <option value="">-- Pilih Sesi --</option>
-          <option value="- Pengenalan Artificial Intelligence">Pengenalan Artificial Intelligence</option>
+          <option value="Sesi 1 - Pengenalan Artificial Intelligence">Pengenalan Artificial Intelligence</option>
         '</select>
       </div>
       <div class="form-group">
@@ -1876,5 +2102,167 @@ window.addEventListener('load', function() {
   }, 300);
 });
 </script>
+
+<!-- ===== LOGIN + LOGOUT + AUTO-LOGOUT JAVASCRIPT ===== -->
+<script>
+(function() {
+  const VALID_USER_HASH = '04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb';
+  const VALID_PASS_HASH = 'e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446';
+  const IDLE_MS   = 5 * 60 * 1000; // 5 menit tidak ada aktivitas
+  const WARN_MS   = 30 * 1000;     // peringatan 30 detik sebelum logout
+
+  async function sha256(msg) {
+    const buf  = new TextEncoder().encode(msg);
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ── Elemen DOM ───────────────────────────────────────────
+  const overlay     = document.getElementById('login-overlay');
+  const mainWrap    = document.getElementById('main-content');
+  const btnLogin    = document.getElementById('login-btn');
+  const errBox      = document.getElementById('login-error');
+  const inputUser   = document.getElementById('login-username');
+  const inputPass   = document.getElementById('login-password');
+  const togglePw    = document.getElementById('toggle-pw');
+  const pwEyeIcon   = document.getElementById('pw-eye-icon');
+  const logoutBtn   = document.getElementById('logout-btn');
+  const warnModal   = document.getElementById('autologout-warning');
+  const countdownEl = document.getElementById('alw-countdown');
+
+  // ── Timer variables ──────────────────────────────────────
+  let idleTimer, warnTimer, countdownInterval;
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    clearTimeout(warnTimer);
+    clearInterval(countdownInterval);
+    if (warnModal.classList.contains('show')) {
+      warnModal.classList.remove('show');
+    }
+    if (sessionStorage.getItem('pkm_auth') !== 'ok') return;
+
+    // Tampilkan peringatan 30 detik sebelum batas waktu
+    warnTimer = setTimeout(function() {
+      let sisa = 30;
+      countdownEl.textContent = sisa;
+      warnModal.classList.add('show');
+      countdownInterval = setInterval(function() {
+        sisa--;
+        countdownEl.textContent = sisa;
+        if (sisa <= 0) {
+          clearInterval(countdownInterval);
+          pkmLogout();
+        }
+      }, 1000);
+    }, IDLE_MS - WARN_MS);
+
+    idleTimer = setTimeout(pkmLogout, IDLE_MS);
+  }
+
+  // Semua event yang dianggap aktivitas
+  ['mousemove','mousedown','keydown','touchstart','scroll','click']
+    .forEach(function(evt) {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+  // ── Logout ───────────────────────────────────────────────
+  window.pkmLogout = function() {
+    clearTimeout(idleTimer);
+    clearTimeout(warnTimer);
+    clearInterval(countdownInterval);
+    sessionStorage.removeItem('pkm_auth');
+    warnModal.classList.remove('show');
+    // Reset form
+    inputUser.value = '';
+    inputPass.value = '';
+    errBox.classList.remove('show');
+    btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i>&nbsp; Masuk';
+    btnLogin.classList.remove('loading');
+    // Animasi kembali ke login
+    mainWrap.style.display  = 'none';
+    logoutBtn.style.display = 'none';
+    overlay.style.opacity   = '0';
+    overlay.style.display   = 'flex';
+    requestAnimationFrame(function() {
+      overlay.style.transition = 'opacity 0.4s ease';
+      overlay.style.opacity    = '1';
+    });
+    setTimeout(function() { inputUser.focus(); }, 450);
+  };
+
+  // ── Tetap Login ──────────────────────────────────────────
+  window.pkmStayLoggedIn = function() {
+    clearTimeout(warnTimer);
+    clearInterval(countdownInterval);
+    warnModal.classList.remove('show');
+    resetIdleTimer();
+  };
+
+  // ── Tampilkan konten setelah login berhasil ──────────────
+  function showMainContent() {
+    overlay.style.transition = 'opacity 0.6s ease';
+    overlay.style.opacity    = '0';
+    setTimeout(function() {
+      overlay.style.display   = 'none';
+      mainWrap.style.display  = 'block';
+      logoutBtn.style.display = 'flex';
+      resetIdleTimer();
+    }, 600);
+  }
+
+  // ── Cek session saat halaman pertama dibuka ──────────────
+  if (sessionStorage.getItem('pkm_auth') === 'ok') {
+    overlay.style.display   = 'none';
+    mainWrap.style.display  = 'block';
+    logoutBtn.style.display = 'flex';
+    resetIdleTimer();
+  }
+
+  // ── Show/hide password ───────────────────────────────────
+  togglePw.addEventListener('click', function() {
+    if (inputPass.type === 'password') {
+      inputPass.type = 'text';
+      pwEyeIcon.className = 'fas fa-eye-slash';
+    } else {
+      inputPass.type = 'password';
+      pwEyeIcon.className = 'fas fa-eye';
+    }
+  });
+
+  // ── Enter key ────────────────────────────────────────────
+  [inputUser, inputPass].forEach(function(el) {
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btnLogin.click();
+    });
+  });
+
+  // ── Proses Login ─────────────────────────────────────────
+  btnLogin.addEventListener('click', async function() {
+    btnLogin.classList.add('loading');
+    btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Memeriksa...';
+    errBox.classList.remove('show');
+
+    const [userHash, passHash] = await Promise.all([
+      sha256(inputUser.value.trim()),
+      sha256(inputPass.value)
+    ]);
+    await new Promise(function(r) { setTimeout(r, 500); });
+
+    if (userHash === VALID_USER_HASH && passHash === VALID_PASS_HASH) {
+      sessionStorage.setItem('pkm_auth', 'ok');
+      showMainContent();
+    } else {
+      errBox.classList.add('show');
+      inputPass.value = '';
+      inputPass.focus();
+      btnLogin.classList.remove('loading');
+      btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i>&nbsp; Masuk';
+    }
+  });
+})();
+</script>
+
+</div><!-- /#main-content -->
 </body>
 </html>
