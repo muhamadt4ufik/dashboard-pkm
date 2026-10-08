@@ -472,11 +472,31 @@ section { padding:80px 5%; }
   text-align: center;
   min-width: 200px;
   flex: 1;
+  position: relative;
 }
 
 .cert-footer-item .sig-space {
-  height: 48px;
-  margin-bottom: 4px;
+  height: 60px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cert-footer-item .sig-stamp-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%);
+  width: 215px;
+  max-width: none;
+  height: auto;
+  z-index: 10;
+  mix-blend-mode: multiply;
+  filter: contrast(1.15);
+  pointer-events: none;
+  user-select: none;
 }
 
 .cert-footer-item .sig {
@@ -485,18 +505,24 @@ section { padding:80px 5%; }
   color: #1a1a2e;
   margin-bottom: 4px;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .cert-footer-item .sig-line {
   border-top: 1px solid #c0a030;
   width: 75%;
   margin: 0 auto 5px;
+  position: relative;
+  z-index: 1;
 }
 
 .cert-footer-item p {
   font-size: clamp(0.62rem, 1.1vw, 0.78rem);
   color: #666;
   line-height: 1.4;
+  position: relative;
+  z-index: 1;
 }
 
 .cert-actions {
@@ -513,6 +539,8 @@ section { padding:80px 5%; }
   .cert-preview { padding: 6% 5%; }
   .cert-corner { width: 36px; height: 36px; }
   .cert-footer-item { min-width: 130px; }
+  .cert-footer-item .sig-space { height: 45px; }
+  .cert-footer-item .sig-stamp-img { width: 135px; }
 }
 
 
@@ -1262,13 +1290,17 @@ footer {
 
       <div class="cert-footer">
         <div class="cert-footer-item">
-          <div class="sig-space"></div>
+          <div class="sig-space">
+            <img src="stampel_kaprodi.jpg" alt="Tanda Tangan dan Stempel Kaprodi" class="sig-stamp-img">
+          </div>
           <div class="sig">Dr. Sajarwo Anggai, S.ST., M.T</div>
           <div class="sig-line"></div>
           <p>Ketua Program Studi<br>Teknik Informatika S-2</p>
         </div>
         <div class="cert-footer-item">
-          <div class="sig-space"></div>
+          <div class="sig-space">
+            <img src="stampel_camat.jpg" alt="Tanda Tangan dan Stempel Camat" class="sig-stamp-img">
+          </div>
           <div class="sig">Drs. Sopian Hadi, MM</div>
           <div class="sig-line"></div>
           <p>Camat<br>Tambun Selatan</p>
@@ -1346,43 +1378,43 @@ footer {
 
     <!-- Foto 4 -->
     <div class="galeri-card">
-      <div class="galeri-date">24 Agustus 2026</div>
+      <div class="galeri-date">07 Oktober 2026</div>
       <div class="gf-rustic">
-        <img src="https://via.placeholder.com/600x400/654321/ffffff?text=Foto+4"
-             alt="Persiapan Kegiatan"
-             data-caption="Persiapan Kegiatan — 24 Agustus 2026">
+        <img src="Diskusi Materi.jpeg"
+             alt="Diskusi Materi PKM"
+             data-caption="Diskusi Materi PKM — 24 Agustus 2026">
       </div>
       <div class="galeri-narrative">
-        <h3>🏡 Persiapan Kegiatan</h3>
-        <p>Kami mempersiapkan segala kebutuhan kegiatan dengan teliti, memastikan setiap detail berjalan sesuai rencana demi kelancaran program PKM kami.</p>
+        <h3>💻 Diskusi Materi PKM</h3>
+        <p>Tim dosen dan mahasiswa berdiskusi secara mendalam mempersiapkan materi workshop AI dan dashboard interaktif demi materi pelatihan yang aplikatif dan bermanfaat.</p>
       </div>
     </div>
 
     <!-- Foto 5 -->
     <div class="galeri-card">
-      <div class="galeri-date">24 Agustus 2026</div>
+      <div class="galeri-date">07 Oktober 2026</div>
       <div class="gf-elegant">
-        <img src="https://via.placeholder.com/600x400/d4af37/ffffff?text=Foto+5"
-             alt="Momen Spesial"
-             data-caption="Momen Spesial — 24 Agustus 2026">
+        <img src="Koordinasi2.jpeg"
+             alt="Koordinasi di Ruang Tamu Camat"
+             data-caption="Koordinasi di Ruang Tamu Camat — 24 Agustus 2026">
       </div>
       <div class="galeri-narrative">
-        <h3>💫 Momen Spesial</h3>
-        <p>Ada detik-detik berharga yang layak dikenang sepanjang masa. Momen kebersamaan kami menjadi warna tersendiri dalam perjalanan PKM ini.</p>
+        <h3>🤝 Koordinasi Bersama Camat</h3>
+        <p>Pertemuan koordinasi dan diskusi intensif bersama Bapak Camat Tambun Selatan di ruang tamu kedinasan untuk memantapkan teknis pelaksanaan kegiatan PKM.</p>
       </div>
     </div>
 
     <!-- Foto 6 -->
     <div class="galeri-card">
-      <div class="galeri-date">24 Agustus 2026</div>
+      <div class="galeri-date">07 Oktober 2026</div>
       <div class="gf-artistic">
-        <img src="https://via.placeholder.com/600x400/2c3e50/ffffff?text=Foto+6"
-             alt="Kebersamaan Tim"
-             data-caption="Kebersamaan Tim — 24 Agustus 2026">
+        <img src="Kordinasi3.jpeg"
+             alt="Foto Bersama Bapak Camat dan Tim PKM"
+             data-caption="Foto Bersama Bapak Camat dan Tim PKM — 24 Agustus 2026">
       </div>
       <div class="galeri-narrative">
-        <h3>🎨 Kebersamaan Tim</h3>
-        <p>Kebersamaan adalah kunci dari setiap keberhasilan. Setiap langkah kami adalah goresan kuas yang membentuk mahakarya perjalanan PKM ini.</p>
+        <h3>✨ Kebersamaan Tim & Bapak Camat</h3>
+        <p>Momen kebersamaan penuh semangat antara tim pelaksana PKM Universitas Pamulang bersama Bapak Camat dan jajaran Kecamatan Tambun Selatan.</p>
       </div>
     </div>
 
