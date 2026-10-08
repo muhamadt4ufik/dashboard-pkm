@@ -2208,6 +2208,9 @@ window.addEventListener('load', function() {
       mainWrap.style.display  = 'block';
       logoutBtn.style.display = 'flex';
       resetIdleTimer();
+      // Reinisialisasi canvas tanda tangan (karena sebelumnya display:none)
+      if (typeof initSignatureCanvas === 'function') initSignatureCanvas();
+      window.dispatchEvent(new Event('resize'));
     }, 600);
   }
 
@@ -2217,6 +2220,11 @@ window.addEventListener('load', function() {
     mainWrap.style.display  = 'block';
     logoutBtn.style.display = 'flex';
     resetIdleTimer();
+    // Reinisialisasi canvas tanda tangan
+    setTimeout(function() {
+      if (typeof initSignatureCanvas === 'function') initSignatureCanvas();
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   }
 
   // ── Show/hide password ───────────────────────────────────
